@@ -1,0 +1,42 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container">
+    <h2>User Login</h2>
+    <div class="row">
+        <form class="col s12" method="POST" action="/login">
+            {{ form.hidden_tag() }}
+            <div class="input-field col s12">
+                <i class="material-icons prefix">account_circle</i>
+                {{ form.username }}
+                <label for="username">username</label>
+            </div>
+            <div class="input-field col s12">
+                <i class="material-icons prefix">verified_user</i>
+                {{ form.password }}
+                <label for="username">password</label>
+            </div>
+            
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <p class="red-text text-darken-1">{{ message }}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div class="input-field col s12">
+                <button class="waves-effect waves-light btn" type="submit"><i class="material-icons right">send</i>Login</button>
+            </div>
+        </form>
+        
+        <div class="col s12">
+            <a href="{{ url_for('index') }}">Return to Home Page</a>
+        </div>
+        
+        
+    </div>
+
+
+</div>
+
+{% endblock %}

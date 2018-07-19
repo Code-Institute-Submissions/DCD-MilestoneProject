@@ -1,0 +1,15 @@
+nav {
+    background-color: #78C2AD;
+}
+
+nav .brand-logo {
+    padding-left: 10px;
+}
+
+@media only screen and (max-width: 992px) {
+    nav .brand-logo {
+        left: 0;
+        -webkit-transform: translateX(0);
+        transform: translateX(0);
+    }
+}
