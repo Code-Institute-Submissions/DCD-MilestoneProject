@@ -2,7 +2,7 @@ import os
 from flask import Flask, redirect, render_template, request, url_for, session, flash
 from flask_pymongo import PyMongo
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField
+from wtforms import StringField, PasswordField, BooleanField, FieldList
 from wtforms.validators import InputRequired, Length
 
 app = Flask(__name__)
@@ -12,14 +12,10 @@ app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds243041.mlab.com:43041/dcd-
 
 mongo = PyMongo(app)
 
-class LoginForm(FlaskForm):
+class UserForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(max=20)])
     password = PasswordField('password', validators=[InputRequired(), Length(max=20)])
-    remember = BooleanField('remember me')
     
-class RegisterForm(FlaskForm):
-    username = StringField('username', validators=[InputRequired(), Length(max=20)])
-    password = PasswordField('password', validators=[InputRequired(), Length(max=20)])
     
 @app.route('/')
 def index():
@@ -27,7 +23,7 @@ def index():
     
 @app.route('/login', methods=['GET',  'POST'])
 def login():
-    form = LoginForm()
+    form = UserForm()
     
     if form.validate_on_submit():
         users = mongo.db.users
@@ -42,7 +38,7 @@ def login():
     
 @app.route('/register', methods=['GET',  'POST'])
 def register():
-    form = RegisterForm()
+    form = UserForm()
     
     if form.validate_on_submit():
         users = mongo.db.users
@@ -53,7 +49,7 @@ def register():
             session['username'] = form.username.data
             return redirect('/')
             
-        flash("Username already exists!")
+        flash("Username already exists!", category='error')
         
     return render_template('register.html', form=form)
     
@@ -61,6 +57,14 @@ def register():
 def logout():
     session.pop('username', None)
     return redirect('/')
+    
+@app.route('/add_recipe')
+def add_recipe():
+    return render_template('add_recipe.html', countries=mongo.db.countries.find(), allergens=mongo.db.allergens.find())
+    
+@app.route('/insert_recipe', methods=['POST'])
+def insert_recipe():
+    return str(request.form.to_dict())
     
 if __name__ == '__main__':
     if __name__ == '__main__':

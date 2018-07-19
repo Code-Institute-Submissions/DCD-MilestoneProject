@@ -6,6 +6,11 @@ nav .brand-logo {
     padding-left: 10px;
 }
 
+.left-option {
+    margin-left: 250px;
+}
+
+/* To override styling in materializecss */
 @media only screen and (max-width: 992px) {
     nav .brand-logo {
         left: 0;

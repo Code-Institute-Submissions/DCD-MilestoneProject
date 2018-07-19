@@ -1,0 +1,64 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="container">
+    <h3>Add Recipe</h3>
+    <div class="row">
+        <form action="{{ url_for('insert_recipe') }}" method="POST" class="col s12" action="/insert_recipe">
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix">format_align_justify</i>
+                    <input type="text" name="name" id="name" maxlength="20" placeholder="Recipe Name" class="validate" required pattern="\S+" title="No white space"/>
+                    <label for="name">Recipe Name</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix">format_align_justify</i>
+                    <div class="chips-placeholder tooltipped" data-position="bottom" data-tooltip="Press 'ENTER' after each cuisine type"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix">public</i>
+                    <select id="origin" name="origin" data-live-search="true" required>
+                        <option value="" disabled selected>Choose Country of Origin (Type in country name to speed up search)</option>
+                        {% for c in countries %}
+                            <option value="{{ c.country }}">{{ c.country }}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Country of Origin</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix">error</i>
+                    <select id="origin" name="origin" data-live-search="true" multiple>
+                        <option value="" disabled>Choose Allergens</option>
+                        {% for a in allergens %}
+                            <option value="{{ a.allergen }}">{{ a.allergen }}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Allergens</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix">person</i> 
+                    {% if 'username' not in session %}
+                        <input disabled value="guest" id="disabled" type="text" class="validate">
+                    {% else %}
+                        <input disabled value="{{ session['username'] }}" id="disabled" type="text" class="validate">
+                    {% endif %}
+                    <label for="author">By</label>
+                </div>
+            </div>
+
+
+            <div class="input-field col s12">
+                <button class="waves-effect waves-light btn" type="submit"><i class="material-icons right">add_circle</i>Add Recipe</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
