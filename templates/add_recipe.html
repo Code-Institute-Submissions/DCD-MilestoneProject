@@ -7,18 +7,16 @@
             <div class="row">
                 <div class="input-field col s12">
                     <i class="material-icons prefix">format_align_justify</i>
-                    <input type="text" name="name" id="name" maxlength="20" placeholder="Recipe Name" class="validate" required pattern="\S+" title="No white space"/>
+                    <input type="text" name="name" id="name" maxlength="20" placeholder="Recipe Name" required pattern="\S+" title="No preceding and ending white spaces" />
                     <label for="name">Recipe Name</label>
                 </div>
             </div>
             <div class="row">
-                <div class="input-field col s12">
+                <div class="input-field col s12 m6">
                     <i class="material-icons prefix">format_align_justify</i>
                     <div class="chips-placeholder tooltipped" data-position="bottom" data-tooltip="Press 'ENTER' after each cuisine type"></div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="input-field col s12">
+                <div class="input-field col s12 m6">
                     <i class="material-icons prefix">public</i>
                     <select id="origin" name="origin" data-live-search="true" required>
                         <option value="" disabled selected>Choose Country of Origin (Type in country name to speed up search)</option>
@@ -30,7 +28,17 @@
                 </div>
             </div>
             <div class="row">
-                <div class="input-field col s12">
+                <div class="intput-field col s12 m6">
+                    <i class="material-icons prefix">library_add</i>
+                    <div class="row" id="ingredients_container">
+                        <div class="ingredient" id="ingredient_1">
+                            <input type="text" name="ingredient_1" placeholder="Ingredient" class="col s7" required pattern="\S+" title="No preceding and ending white spaces" />
+                            <input type="text" name="unit_1" placeholder="Unit" class="col s3" required pattern="\S+" title="No preceding and ending white spaces" />
+                            <a class="btn waves-effect waves-light add_ingredient col s2"><i class="material-icons">add</i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-field col s12 m6">
                     <i class="material-icons prefix">error</i>
                     <select id="origin" name="origin" data-live-search="true" multiple>
                         <option value="" disabled>Choose Allergens</option>
@@ -43,12 +51,9 @@
             </div>
             <div class="row">
                 <div class="input-field col s12">
-                    <i class="material-icons prefix">person</i> 
-                    {% if 'username' not in session %}
-                        <input disabled value="guest" id="disabled" type="text" class="validate">
-                    {% else %}
-                        <input disabled value="{{ session['username'] }}" id="disabled" type="text" class="validate">
-                    {% endif %}
+                    <i class="material-icons prefix">person</i> {% if 'username' not in session %}
+                    <input disabled value="guest" id="disabled" type="text" class="validate"> {% else %}
+                    <input disabled value="{{ session['username'] }}" id="disabled" type="text" class="validate"> {% endif %}
                     <label for="author">By</label>
                 </div>
             </div>
