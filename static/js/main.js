@@ -29,4 +29,26 @@ $(document).ready(function() {
         $("#ingredient_" + deleteindex).remove();
 
     });
+    
+    $('.add_instruction').click(function() {
+
+        var last = $(".instruction:last").attr("id");
+        var split_id = last.split("_");
+        var next = Number(split_id[1]) + 1;
+
+        $(".instruction:last").after('<div class="instruction" id="instruction_' + next + '"></div>');
+        $("#instruction_" + next).append(
+            '<textarea class="materialize-textarea col s11" placeholder="Instruction" name="instruction_' + next + '"></textarea>' +
+            '<a class="btn waves-effect waves-light red col s1 remove_instruction" id="remove_' + next + '"><i class="material-icons">remove</i></a>'
+        );
+    });
+    
+    $('#instructions_container').on('click', '.remove_instruction', function() {
+        var id = this.id;
+        var split_id = id.split("_");
+        var deleteindex = split_id[1];
+
+        $("#instruction_" + deleteindex).remove();
+
+    });
 });

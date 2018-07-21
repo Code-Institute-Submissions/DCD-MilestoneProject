@@ -30,7 +30,7 @@
             <div class="row">
                 <div class="intput-field col s12 m6">
                     <i class="material-icons prefix">library_add</i>
-                    <div class="row" id="ingredients_container">
+                    <div id="ingredients_container">
                         <div class="ingredient" id="ingredient_1">
                             <input type="text" name="ingredient_1" placeholder="Ingredient" class="col s7" required pattern="\S+" title="No preceding and ending white spaces" />
                             <input type="text" name="unit_1" placeholder="Unit" class="col s3" required pattern="\S+" title="No preceding and ending white spaces" />
@@ -51,13 +51,23 @@
             </div>
             <div class="row">
                 <div class="input-field col s12">
+                    <div id="instructions_container">
+                        <div class="instruction" id="instruction_1">
+                            <textarea class="materialize-textarea col s11" placeholder="Instruction" name="instruction_1" required></textarea>
+                            <a class="btn waves-effect waves-light add_instruction col s1"><i class="material-icons">add</i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s12">
                     <i class="material-icons prefix">person</i> {% if 'username' not in session %}
                     <input disabled value="guest" id="disabled" type="text" class="validate"> {% else %}
                     <input disabled value="{{ session['username'] }}" id="disabled" type="text" class="validate"> {% endif %}
                     <label for="author">By</label>
                 </div>
             </div>
-
 
             <div class="input-field col s12">
                 <button class="waves-effect waves-light btn" type="submit"><i class="material-icons right">add_circle</i>Add Recipe</button>
