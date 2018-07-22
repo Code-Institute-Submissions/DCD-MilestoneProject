@@ -6,6 +6,8 @@
 - On top of basic grouping, users will also be able to search for recipes.
 - The application will provide user registeration and authentication for better security. (i.e. users can only edit or delete recipes they created)
 
+</details>
+
 ## Change Log
 
 ### 22/07/2018
