@@ -7,3 +7,7 @@
 - The application will provide user registeration and authentication for better security. (i.e. users can only edit or delete recipes they created)
 
 ## Change Log
+
+### 22/07/2018
+- User login functionality implemented.
+- Ability to add recipe implemented.
