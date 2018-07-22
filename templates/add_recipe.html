@@ -11,7 +11,7 @@
                 </div>
             </div>
             <div class="row">
-                <div class="input-field col s12 m4">
+                <div class="input-field col s12 m5">
                     <div id="cuisines_container">
                         <div class="cuisine" id="cuisine_1">
                             <input type="text" name="cuisine_1" placeholder="Cuisine" minlength="2" maxlength="20" class="col s8" required/>
@@ -19,7 +19,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="input-field col s12 m8">
+                <div class="input-field col s12 m7">
                     <select id="origin" name="origin" data-live-search="true" required>
                         <option value="" disabled selected>Choose Country of Origin (Type in country name to speed up search)</option>
                         {% for c in countries %}
@@ -40,7 +40,7 @@
                     </div>
                 </div>
                 <div class="input-field col s12 m6">
-                    <select id="origin" name="origin" data-live-search="true" multiple>
+                    <select id="allergens" name="allergens" data-live-search="true" multiple>
                         <option value="" disabled>Choose Allergens</option>
                         {% for a in allergens %}
                             <option value="{{ a.allergen }}">{{ a.allergen }}</option>
@@ -63,8 +63,8 @@
             <div class="row">
                 <div class="input-field col s12">
                     <i class="material-icons prefix show-on-medium-and-up">person</i> {% if 'username' not in session %}
-                    <input disabled value="guest" id="disabled" type="text" class="validate"> {% else %}
-                    <input disabled value="{{ session['username'] }}" id="disabled" type="text" class="validate"> {% endif %}
+                    <input disabled value="guest" name="author" id="author" type="text" class="validate"> {% else %}
+                    <input disabled value="{{ session['username'] }}" name="author" id="author" type="text" class="validate"> {% endif %}
                     <label for="author">By</label>
                 </div>
             </div>

@@ -12,6 +12,14 @@ app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds243041.mlab.com:43041/dcd-
 
 mongo = PyMongo(app)
 
+def categorise(category_name, user_input):
+    output = []
+    for key, val in user_input.items():
+        if category_name in key:
+            output.append(val)
+    
+    return output
+
 class UserForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(max=20)])
     password = PasswordField('password', validators=[InputRequired(), Length(max=20)])
@@ -64,7 +72,49 @@ def add_recipe():
     
 @app.route('/insert_recipe', methods=['POST'])
 def insert_recipe():
-    return str(request.form.to_dict())
+    recipes = mongo.db.recipes
+    
+    # Reorganise all data before inserting into database
+    user_input = request.form.to_dict()
+    
+    # Separate cuisines into a separate list
+    cuisines = categorise('cuisine', user_input)
+    
+    # Separate ingredients into a separate dictionary
+    ingredients = []
+    unit = []
+    for key, val in user_input.items():
+        if 'ingredient' in key:
+            ingredients.append(val)
+        if 'unit' in key:
+            unit.append(val)
+            
+    ingredients_unit = {}
+    for x in range(0, len(ingredients)):
+        ingredients_unit[str(x)] = {"ingredient": ingredients[x], "unit": unit[x]}
+    
+    instructions = {}
+    for key, val in user_input.items():
+        if 'instruction' in key:
+            instructions[key] = val
+    
+    author = "guest"
+    if 'user' in session:
+        author = session['user']
+    
+    data = {
+        "recipe_name": request.form['name'],
+        "origin": request.form['origin'],
+        "cuisine": cuisines,
+        "ingredients": ingredients_unit,
+        "allergens": request.form.getlist('allergens'),
+        "instructions": instructions,
+        "author": author
+    }
+    
+    recipes.insert_one(data)
+    
+    return redirect('/')
     
 if __name__ == '__main__':
     if __name__ == '__main__':
