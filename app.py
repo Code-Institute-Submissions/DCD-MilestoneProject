@@ -4,6 +4,7 @@ from flask_pymongo import PyMongo
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, FieldList
 from wtforms.validators import InputRequired, Length
+from bson.objectid import ObjectId
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'THIS_IS_SECRET_KEY' 
@@ -49,6 +50,10 @@ def register():
     form = UserForm()
     
     if form.validate_on_submit():
+        if request.form['username'].strip().lower() == "guest":
+            flash("This is a reserved name, please choose another name.")
+            return render_template('register.html', form=form)
+
         users = mongo.db.users
         existing_user = users.find_one({'username': form.username.data})
         
@@ -91,7 +96,7 @@ def insert_recipe():
             
     ingredients_unit = {}
     for x in range(0, len(ingredients)):
-        ingredients_unit[str(x)] = {"ingredient": ingredients[x], "unit": unit[x]}
+        ingredients_unit[ingredients[x]] = unit[x]
     
     instructions = {}
     for key, val in user_input.items():
@@ -102,20 +107,28 @@ def insert_recipe():
     if 'user' in session:
         author = session['user']
     
+    # Reorganise all data into one dictionary before inserting into database
     data = {
         "recipe_name": request.form['name'],
         "origin": request.form['origin'],
-        "cuisine": cuisines,
-        "ingredients": ingredients_unit,
+        "cuisine": cuisines, # A list
+        "ingredients": ingredients_unit, # A dictionary
         "allergens": request.form.getlist('allergens'),
-        "instructions": instructions,
-        "author": author
+        "instructions": instructions, # A dictionary
+        "author": author,
+        "views": 0,
+        "upvote": 0
     }
     
     recipes.insert_one(data)
     
     return redirect('/')
+
+@app.route('/view_recipe/<recipe_id>')
+def view_recipe(recipe_id):
+    return render_template('view_recipe.html', recipe=mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)}))
     
 if __name__ == '__main__':
     if __name__ == '__main__':
-        app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=True, threaded=True)
+        # app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=True, threaded=True)
+        app.run(debug=True, threaded=True)

@@ -74,6 +74,4 @@ $(document).ready(function() {
 
     });
     
-    var allergens = $('#allergens').getSelectedValues();
-    console.log(allergens);
 });

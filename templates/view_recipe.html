@@ -1,0 +1,49 @@
+{% extends 'base.html' %} {% block content %}
+<div class="container">
+    <h3>{{ recipe.recipe_name }} <span id="view_recipe_author">by {{ recipe.author }}</span></h3>
+    <div class="row">
+        <div class="col s12 m8">
+            <h4>Country of origin</h4> {{ recipe.origin }}
+        </div>
+        <div class="col s12 m4">
+            <h4>Cuisine</h4> {% for c in recipe.cuisine %}
+            <div class="chip">{{ c }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col s12 m8">
+            <h4>Ingredients</h4>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ingredient</th>
+                        <th>Unit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                	{% for key, val in recipe.ingredients.items() %}
+                	<tr>
+                		<td>{{ key }}</td>
+                		<td>{{ val }}</td>
+                	</tr>
+                	{% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col s12 m4">
+        	<h4>Allergens</h4> {% for a in recipe.allergens %}
+            <div class="chip">{{ a }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="row">
+    	<div class="col s12">
+    		<h4>Instructions</h4>
+    		{% for key, val in recipe.instructions.items() %}
+    		<p>{{ loop.index }}. {{ val }}</p>
+    		{% endfor %}
+    	</div>
+    </div>
+</div>
+{% endblock %}
