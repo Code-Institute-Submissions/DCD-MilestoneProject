@@ -104,8 +104,8 @@ def insert_recipe():
             instructions[key] = val
     
     author = "guest"
-    if 'user' in session:
-        author = session['user']
+    if 'username' in session:
+        author = session['username']
     
     # Reorganise all data into one dictionary before inserting into database
     data = {
@@ -128,6 +128,32 @@ def insert_recipe():
 def view_recipe(recipe_id):
     return render_template('view_recipe.html', recipe=mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)}))
     
+@app.route('/edit_recipe/<recipe_id>')
+def edit_recipe(recipe_id):
+    recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    if 'username' in session and session['username'] == recipe['author']: # Only allows users to update recipes they created.
+        return render_template('edit_recipe.html', recipe=recipe)
+
+    return redirect('/')
+
+@app.route('/delete_recipe/<recipe_id>')
+def delete_recipe(recipe_id):
+    recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    if 'username' in session and session['username'] == recipe['author']:
+        mongo.db.recipes.remove({"_id": ObjectId(recipe_id)})
+        return redirect('/')
+
+    return "You are not allowed to delete this recipe."
+
+@app.route('/user/<user_name>')
+def user_page(user_name):
+    if 'username' in session:
+        pointer = mongo.db.recipes.find({"author": user_name })
+        recipes = [p for p in pointer]
+        return render_template('user_page.html', recipes=recipes)
+
+    return redirect('/')
+
 if __name__ == '__main__':
     if __name__ == '__main__':
         # app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=True, threaded=True)
