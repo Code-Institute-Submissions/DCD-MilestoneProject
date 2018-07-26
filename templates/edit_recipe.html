@@ -1,5 +1,104 @@
 {% extends 'base.html' %} {% block content %}
 
-This is the edit page for recipe {{ recipe.recipe_name }}
+<div class="container">
+    <h3>Edit Recipe</h3>
+    <div class="row">
+        <form action="{{ url_for('update_recipe', recipe_id=recipe._id ) }}" method="POST" class="col s12">
+            <div class="row">
+                <div class="input-field col s12">
+                    <input type="text" name="name" id="name" minlength="2" maxlength="20" required value="{{ recipe.recipe_name }}"/>
+                    <label for="name">Recipe Name</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m5">
+                    <div id="cuisines_container">
+                        {% for c in recipe.cuisine %}
+                        <div class="cuisine" id="cuisine_{{ loop.index }}">
+                            <input type="text" name="cuisine_{{ loop.index }}" placeholder="Cuisine" minlength="2" maxlength="20" class="col s8" required value="{{ c }}"/>
+                            {% if loop.index == 1 %}
+                            <a class="btn waves-effect waves-light add_cuisine col s4"><i class="material-icons">add</i></a>
+                            {% else %}
+                            <a class="btn waves-effect waves-light red remove_cuisine col s4" id="remove_{{ loop.index }}"><i class="material-icons">remove</i></a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="input-field col s12 m7">
+                    <select id="origin" name="origin" data-live-search="true" required>
+                        <option disabled selected>Choose Country of Origin (Type in country name to speed up search)</option>
+                        {% for c in countries %}
+                            {% if c.country == recipe.origin %}
+                                <option value="{{ c.country }}" selected>{{ c.country }}</option>
+                            {% else %}
+                                <option value="{{ c.country }}">{{ c.country }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <label>Country of Origin</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="intput-field col s12 m6">
+                    <div id="ingredients_container">
+                        {% for key, val in recipe.ingredients.items() %}
+                        <div class="ingredient" id="ingredient_{{ loop.index }}">
+                            <input type="text" name="ingredient_{{ loop.index }}" placeholder="Ingredient" class="col s6" required value="{{ key }}"/>
+                            <input type="text" name="unit_{{ loop.index }}" placeholder="Unit" class="col s3" required value="{{ val }}"/>
+                            {% if loop.index == 1%}
+                            <a class="btn waves-effect waves-light add_ingredient col s3"><i class="material-icons">add</i></a>
+                            {% else %}
+                            <a class="btn waves-effect waves-light red col s3 remove_ingredient" id="remove_{{ loop.index }}"><i class="material-icons">remove</i></a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="input-field col s12 m6">
+                    <select id="allergens" name="allergens" data-live-search="true" multiple>
+                        <option value="" disabled>Choose Allergens</option>
+                        {% for a in allergens %}
+                            {% if a.allergen in recipe.allergens %}
+                            <option value="{{ a.allergen }}" selected>{{ a.allergen }}</option>
+                            {% else %}
+                            <option value="{{ a.allergen }}">{{ a.allergen }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <label>Allergens</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12">
+                    <div id="instructions_container">
+                        {% for key, val in recipe.instructions.items() %}
+                        <div class="instruction" id="instruction_{{ loop.index }}">
+                            <textarea class="materialize-textarea col s10 " placeholder="Instruction" name="instruction_{{ loop.index }}" required>{{ val }}</textarea>
+                            {% if loop.index == 1 %}
+                            <a class="btn waves-effect waves-light add_instruction col s2"><i class="material-icons">add</i></a>
+                            {% else %}
+                            <a class="btn waves-effect waves-light red col s2 remove_instruction" id="remove_{{ loop.index }}"><i class="material-icons">remove</i></a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix show-on-medium-and-up">person</i>
+                    <input disabled value="{{ recipe.author }}" name="author" id="author" type="text">
+                    <label for="author">By</label>
+                </div>
+            </div>
+
+            <div class="input-field col s12">
+                <button class="waves-effect waves-light btn" type="submit">Update Recipe</button>
+            </div>
+        </form>
+    </div>
+</div>
 
 {% endblock %}

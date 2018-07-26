@@ -131,10 +131,50 @@ def view_recipe(recipe_id):
 @app.route('/edit_recipe/<recipe_id>')
 def edit_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    if 'username' in session and session['username'] == recipe['author']: # Only allows users to update recipes they created.
-        return render_template('edit_recipe.html', recipe=recipe)
+    # Only allows users to update recipes they created.
+    if 'username' in session and session['username'] == recipe['author']:
+        return render_template('edit_recipe.html', recipe=recipe, countries=mongo.db.countries.find(), allergens=mongo.db.allergens.find())
 
     return redirect('/')
+
+@app.route('/update_recipe/<recipe_id>', methods=['POST'])
+def update_recipe(recipe_id):
+    recipes = mongo.db.recipes
+    recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    user_input = request.form.to_dict()
+    cuisines = categorise('cuisine', user_input)
+    ingredients = []
+    unit = []
+    for key, val in user_input.items():
+        if 'ingredient' in key:
+            ingredients.append(val)
+        if 'unit' in key:
+            unit.append(val)
+            
+    ingredients_unit = {}
+    for x in range(0, len(ingredients)):
+        ingredients_unit[ingredients[x]] = unit[x]
+    
+    instructions = {}
+    for key, val in user_input.items():
+        if 'instruction' in key:
+            instructions[key] = val
+
+    recipes.update_one({'_id': ObjectId(recipe_id)},
+        { '$set': {
+                    "recipe_name": request.form['name'],
+                    "origin": request.form['origin'],
+                    "cuisine": cuisines, # A list
+                    "ingredients": ingredients_unit, # A dictionary
+                    "allergens": request.form.getlist('allergens'),
+                    "instructions": instructions,
+                    "author": recipe['author'],
+                    "views": recipe['views'],
+                    "upvote": recipe['upvote']
+                }})
+
+    return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
+
 
 @app.route('/delete_recipe/<recipe_id>')
 def delete_recipe(recipe_id):
@@ -143,7 +183,7 @@ def delete_recipe(recipe_id):
         mongo.db.recipes.remove({"_id": ObjectId(recipe_id)})
         return redirect('/')
 
-    return "You are not allowed to delete this recipe."
+    return "You are not authorised to delete this recipe."
 
 @app.route('/user/<user_name>')
 def user_page(user_name):

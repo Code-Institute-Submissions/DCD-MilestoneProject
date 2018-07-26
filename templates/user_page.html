@@ -8,7 +8,7 @@
             <div class="collapsible-header">
                 {{ r.recipe_name }}
                 <a href="{{ url_for('edit_recipe', recipe_id=r._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>
-                <button data-model="{{ r._id }}" class="btn waves-effect waves-light red modal-trigger">Delete Recipe</button>
+                <button data-target="{{ r._id }}" class="btn waves-effect waves-light red modal-trigger">Delete Recipe</button>
             </div>
             <div class="collapsible-body">
                 <div class="row">
@@ -67,7 +67,8 @@
             <p>Are you sure?</p>
         </div>
         <div class="modal-footer">
-            <a href="#" class="waves-effect waves-light btn">Yes</a>
+            <a href="{{ url_for('delete_recipe', recipe_id=r._id )}}" class="waves-effect waves-light btn"><i class="material-icons">check</i>Yes</a>
+            <a class="waves-effect waves-light btn red modal-close"><i class="material-icons">close</i>No</a>
         </div>
     </div>
     {% endfor %}
