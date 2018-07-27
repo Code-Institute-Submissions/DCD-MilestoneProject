@@ -5,6 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, FieldList
 from wtforms.validators import InputRequired, Length
 from bson.objectid import ObjectId
+from datetime import datetime
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'THIS_IS_SECRET_KEY' 
@@ -117,7 +118,9 @@ def insert_recipe():
         "instructions": instructions, # A dictionary
         "author": author,
         "views": 0,
-        "upvote": 0
+        "upvote": 0,
+        "time_created": datetime.utcnow(),
+        "last_modified": datetime.utcnow()
     }
     
     recipes.insert_one(data)
@@ -170,7 +173,9 @@ def update_recipe(recipe_id):
                     "instructions": instructions,
                     "author": recipe['author'],
                     "views": recipe['views'],
-                    "upvote": recipe['upvote']
+                    "upvote": recipe['upvote'],
+                    "time_created": recipe['time_created'],
+                    "last_modified": datetime.utcnow()
                 }})
 
     return redirect(url_for('view_recipe', recipe_id=recipe['_id']))

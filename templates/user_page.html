@@ -7,12 +7,13 @@
             {% for r in recipes %}
             <li>
                 <div class="collapsible-header">
-                    {{ r.recipe_name }}
-                    (Views: {{ r.views }})
-                    <span class="right user_recipe_option">
+                    <div class="col s12">
+                        {{ r.recipe_name }} || Views: {{ r.views }} | Created on: {{ r.time_created.strftime('%Y-%m-%d %H:%M:%S') }} | Last modified: {{ r.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}
+                    </div>
+                    <div class="col s12">
                         <a href="{{ url_for('edit_recipe', recipe_id=r._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>
                         <a data-target="{{ r._id }}" class="btn waves-effect waves-light red modal-trigger">Delete Recipe</a>
-                    </span>
+                    </div>
                 </div>
                 <div class="collapsible-body">
                     <div class="row">

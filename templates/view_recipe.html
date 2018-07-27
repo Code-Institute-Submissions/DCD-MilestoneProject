@@ -1,11 +1,11 @@
 {% extends 'base.html' %} {% block content %}
 <div class="container">
     <h3>
-        {{ recipe.recipe_name }} <span id="view_recipe_author">by {{ recipe.author }}</span>
+        {{ recipe.recipe_name }} <span class="subtext">by {{ recipe.author }}    Views: {{ recipe.views }}</span>
         {% if 'username' in session and session['username'] == recipe.author %}
             <span class="right">
-                <a href="#" class="btn waves-effect waves-light">Edit Recipe</a>
-                <a href="#" class="btn waves-effect waves-light red">Delete Recipe</a>
+                <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>
+                <a data-target="view_recipe_modal" class="btn waves-effect waves-light red">Delete Recipe</a>
             </span>
         {% endif %}
     </h3>
@@ -53,7 +53,19 @@
         </div>
     </div>
     <div class="row">
-        <p>Views: {{ recipe.views }}</p>
+        <p>Created on: {{ recipe.time_created.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        <p>Last modified: {{ recipe.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+    </div>
+    <div class="modal" id="view_recipe_modal">
+        <div class="modal-content">
+            <p>You are about to delete the following recipe:</p>
+            <p>{{ recipe.recipe_name }}</p>
+            <p>Are you sure?</p>
+        </div>
+        <div class="modal-footer">
+            <a href="{{ url_for('delete_recipe', recipe_id=recipe._id )}}" class="waves-effect waves-light btn"><i class="material-icons left">check</i>Yes</a>
+            <a class="waves-effect waves-light btn red modal-close"><i class="material-icons left">close</i>No</a>
+        </div>
     </div>
 </div>
 {% endblock %}

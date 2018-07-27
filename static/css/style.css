@@ -10,16 +10,12 @@ nav .brand-logo {
     margin-left: 250px;
 }
 
-#view_recipe_author {
+.subtext {
 	font-size: 50%;
 }
 
 .collapsible-header {
 	display: block;
-}
-
-.user_recipe_option {
-    transform: translateY(-8px);
 }
 
 .index_layout {
