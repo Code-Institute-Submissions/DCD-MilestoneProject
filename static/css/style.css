@@ -18,6 +18,14 @@ nav .brand-logo {
 	display: block;
 }
 
+.user_recipe_option {
+    transform: translateY(-8px);
+}
+
+.index_layout {
+    padding: 0 !important;
+}
+
 /* To override styling in materializecss */
 @media only screen and (max-width: 992px) {
     nav .brand-logo {

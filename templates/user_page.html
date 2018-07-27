@@ -7,8 +7,10 @@
         <li>
             <div class="collapsible-header">
                 {{ r.recipe_name }}
-                <a href="{{ url_for('edit_recipe', recipe_id=r._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>
-                <button data-target="{{ r._id }}" class="btn waves-effect waves-light red modal-trigger">Delete Recipe</button>
+                <span class="right user_recipe_option">
+                    <a href="{{ url_for('edit_recipe', recipe_id=r._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>
+                    <a data-target="{{ r._id }}" class="btn waves-effect waves-light red modal-trigger">Delete Recipe</a>
+                </span>
             </div>
             <div class="collapsible-body">
                 <div class="row">
@@ -58,7 +60,6 @@
         </li>
         {% endfor %}
     </ul>
-
     {% for r in recipes %}
     <div class="modal" id="{{ r._id }}">
         <div class="modal-content">
@@ -67,8 +68,8 @@
             <p>Are you sure?</p>
         </div>
         <div class="modal-footer">
-            <a href="{{ url_for('delete_recipe', recipe_id=r._id )}}" class="waves-effect waves-light btn"><i class="material-icons">check</i>Yes</a>
-            <a class="waves-effect waves-light btn red modal-close"><i class="material-icons">close</i>No</a>
+            <a href="{{ url_for('delete_recipe', recipe_id=r._id )}}" class="waves-effect waves-light btn"><i class="material-icons left">check</i>Yes</a>
+            <a class="waves-effect waves-light btn red modal-close"><i class="material-icons left">close</i>No</a>
         </div>
     </div>
     {% endfor %}
