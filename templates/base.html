@@ -47,6 +47,11 @@
         {% endif %}
         
         <li><a href="{{ url_for('add_recipe') }}">Add Recipe</a></li>
+
+        <div class="hide-on-med-and-up ">
+            <li>New Arrivals</li>
+            <li>Test 2</li>
+        </div>
         
         {% if 'username' in session %}
             <li><a href="{{ url_for('logout') }}">Logout</a></li>

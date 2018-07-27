@@ -1,77 +1,85 @@
 {% extends 'base.html' %} {% block content %}
 <div class="container">
     <h1>Hi, {{ session['username'] }}</h1>
-    <p>Here is a list of the recipes you created.</p>
-    <ul class="collapsible">
+    {% if recipes|length != 0 %}
+        <p>Here is a list of the recipes you created.</p>
+        <ul class="collapsible">
+            {% for r in recipes %}
+            <li>
+                <div class="collapsible-header">
+                    {{ r.recipe_name }}
+                    (Views: {{ r.views }})
+                    <span class="right user_recipe_option">
+                        <a href="{{ url_for('edit_recipe', recipe_id=r._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>
+                        <a data-target="{{ r._id }}" class="btn waves-effect waves-light red modal-trigger">Delete Recipe</a>
+                    </span>
+                </div>
+                <div class="collapsible-body">
+                    <div class="row">
+                        <div class="col s12 m8">
+                            <h4>Country of origin</h4> {{ r.origin }}
+                        </div>
+                        <div class="col s12 m4">
+                            <h4>Cuisine</h4> {% for c in r.cuisine %}
+                            <div class="chip">{{ c }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 m8">
+                            <h4>Ingredients</h4>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Ingredient</th>
+                                        <th>Unit</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for key, val in r.ingredients.items() %}
+                                    <tr>
+                                        <td>{{ key }}</td>
+                                        <td>{{ val }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col s12 m4">
+                            <h4>Allergens</h4> {% for a in r.allergens %}
+                            <div class="chip">{{ a }}</div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12">
+                            <h4>Instructions</h4> {% for key, val in r.instructions.items() %}
+                            <p>{{ loop.index }}. {{ val }}</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
         {% for r in recipes %}
-        <li>
-            <div class="collapsible-header">
-                {{ r.recipe_name }}
-                <span class="right user_recipe_option">
-                    <a href="{{ url_for('edit_recipe', recipe_id=r._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>
-                    <a data-target="{{ r._id }}" class="btn waves-effect waves-light red modal-trigger">Delete Recipe</a>
-                </span>
+        <div class="modal" id="{{ r._id }}">
+            <div class="modal-content">
+                <p>You are about to delete the following recipe:</p>
+                <p>{{ r.recipe_name }}</p>
+                <p>Are you sure?</p>
             </div>
-            <div class="collapsible-body">
-                <div class="row">
-                    <div class="col s12 m8">
-                        <h4>Country of origin</h4> {{ r.origin }}
-                    </div>
-                    <div class="col s12 m4">
-                        <h4>Cuisine</h4> {% for c in r.cuisine %}
-                        <div class="chip">{{ c }}</div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col s12 m8">
-                        <h4>Ingredients</h4>
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Ingredient</th>
-                                    <th>Unit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for key, val in r.ingredients.items() %}
-                                <tr>
-                                    <td>{{ key }}</td>
-                                    <td>{{ val }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="col s12 m4">
-                        <h4>Allergens</h4> {% for a in r.allergens %}
-                        <div class="chip">{{ a }}</div>
-                        {% endfor %}
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col s12">
-                        <h4>Instructions</h4> {% for key, val in r.instructions.items() %}
-                        <p>{{ loop.index }}. {{ val }}</p>
-                        {% endfor %}
-                    </div>
-                </div>
+            <div class="modal-footer">
+                <a href="{{ url_for('delete_recipe', recipe_id=r._id )}}" class="waves-effect waves-light btn"><i class="material-icons left">check</i>Yes</a>
+                <a class="waves-effect waves-light btn red modal-close"><i class="material-icons left">close</i>No</a>
             </div>
-        </li>
+        </div>
         {% endfor %}
-    </ul>
-    {% for r in recipes %}
-    <div class="modal" id="{{ r._id }}">
-        <div class="modal-content">
-            <p>You are about to delete the following recipe:</p>
-            <p>{{ r.recipe_name }}</p>
-            <p>Are you sure?</p>
+    {% else %}
+        <div class="center">
+            <h2>You have yet to add any recipes. Get started now!</h2>
+            <a href="{{ url_for('add_recipe') }}" class="btn btn-large waves-effect waves-light">Add Recipe</a>
         </div>
-        <div class="modal-footer">
-            <a href="{{ url_for('delete_recipe', recipe_id=r._id )}}" class="waves-effect waves-light btn"><i class="material-icons left">check</i>Yes</a>
-            <a class="waves-effect waves-light btn red modal-close"><i class="material-icons left">close</i>No</a>
-        </div>
-    </div>
-    {% endfor %}
+    {% endif %}
 </div>
 {% endblock %}

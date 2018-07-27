@@ -140,7 +140,6 @@ def edit_recipe(recipe_id):
 
 @app.route('/update_recipe/<recipe_id>', methods=['POST'])
 def update_recipe(recipe_id):
-    recipes = mongo.db.recipes
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
     user_input = request.form.to_dict()
     cuisines = categorise('cuisine', user_input)
@@ -161,7 +160,7 @@ def update_recipe(recipe_id):
         if 'instruction' in key:
             instructions[key] = val
 
-    recipes.update_one({'_id': ObjectId(recipe_id)},
+    mongo.db.recipes.update_one({'_id': ObjectId(recipe_id)},
         { '$set': {
                     "recipe_name": request.form['name'],
                     "origin": request.form['origin'],
