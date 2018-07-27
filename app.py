@@ -126,6 +126,7 @@ def insert_recipe():
 
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
+    mongo.db.recipes.update_one({"_id": ObjectId(recipe_id)}, {'$inc': {"views": 1}})
     return render_template('view_recipe.html', recipe=mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)}))
     
 @app.route('/edit_recipe/<recipe_id>')

@@ -1,6 +1,14 @@
 {% extends 'base.html' %} {% block content %}
 <div class="container">
-    <h3>{{ recipe.recipe_name }} <span id="view_recipe_author">by {{ recipe.author }}</span></h3>
+    <h3>
+        {{ recipe.recipe_name }} <span id="view_recipe_author">by {{ recipe.author }}</span>
+        {% if 'username' in session and session['username'] == recipe.author %}
+            <span class="right">
+                <a href="#" class="btn waves-effect waves-light">Edit Recipe</a>
+                <a href="#" class="btn waves-effect waves-light red">Delete Recipe</a>
+            </span>
+        {% endif %}
+    </h3>
     <div class="row">
         <div class="col s12 m8">
             <h4>Country of origin</h4> {{ recipe.origin }}
@@ -22,31 +30,30 @@
                     </tr>
                 </thead>
                 <tbody>
-                	{% for key, val in recipe.ingredients.items() %}
-                	<tr>
-                		<td>{{ key }}</td>
-                		<td>{{ val }}</td>
-                	</tr>
-                	{% endfor %}
+                    {% for key, val in recipe.ingredients.items() %}
+                    <tr>
+                        <td>{{ key }}</td>
+                        <td>{{ val }}</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
         <div class="col s12 m4">
-        	<h4>Allergens</h4> {% for a in recipe.allergens %}
+            <h4>Allergens</h4> {% for a in recipe.allergens %}
             <div class="chip">{{ a }}</div>
             {% endfor %}
         </div>
     </div>
     <div class="row">
-    	<div class="col s12">
-    		<h4>Instructions</h4>
-    		{% for key, val in recipe.instructions.items() %}
-    		<p>{{ loop.index }}. {{ val }}</p>
-    		{% endfor %}
-    	</div>
+        <div class="col s12">
+            <h4>Instructions</h4> {% for key, val in recipe.instructions.items() %}
+            <p>{{ loop.index }}. {{ val }}</p>
+            {% endfor %}
+        </div>
     </div>
     <div class="row">
-        
+        <p>Views: {{ recipe.views }}</p>
     </div>
 </div>
 {% endblock %}
