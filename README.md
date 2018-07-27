@@ -10,6 +10,11 @@
 
 ## Change Log
 
+### 27/07/2018
+- CRUD operation implemented on recipes.
+	- Though update and delete is only available to the one who created the recipe whilst creating a new recipe and viewing recipes are available to anyone event if they are not logged in (as 'guest') however, recipes created by 'guests' cannot be edited and deleted by anyone.
+	- As of now, users can view recipes they created from their user page, though proper methods of viewing recipes in general has not been established yet (except for the route).
+
 ### 22/07/2018
 - User login functionality implemented.
 - Ability to add recipe implemented.
