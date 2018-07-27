@@ -41,7 +41,7 @@
         <li>
             <div class="user-view">
                 <div class="background green darken-2"></div>
-                <h3 class="white-text">Hi, {{ session['username'] }}</h3>
+                <a href="{{ url_for('user_page', user_name = session['username']) }}"><h3 class="white-text">Hi, {{ session['username'] }}</h3></a>
             </div>
         </li>
         {% endif %}
