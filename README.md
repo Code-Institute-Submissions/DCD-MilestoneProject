@@ -10,6 +10,13 @@
 
 ## Change Log
 
+### 29/07/2018
+- Added basic groupings of recipes such as showing the 5 most recently added recipe on index.html whilst giving a more detailed list (up to 20 items) in a separate page. As of now, there are 3 default groupings:
+	- New Arrivals (recently added recipes)
+	- Most Popular (recipes with most views)
+	- Capricious Recipes (recipes created by 'guests')
+More groupings will be added including more advanced ones where user can adjust criteria for example, users can filter recipes that has a particular country of origin.
+
 ### 27/07/2018
 - CRUD operation implemented on recipes.
 	- Though update and delete is only available to the one who created the recipe whilst creating a new recipe and viewing recipes are available to anyone event if they are not logged in (as 'guest') however, recipes created by 'guests' cannot be edited and deleted by anyone.
