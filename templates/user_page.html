@@ -1,18 +1,22 @@
 {% extends 'base.html' %} {% block content %}
-<div class="container">
-    <h1>Hi, {{ session['username'] }}</h1>
+<div class="col s12 m8 l10 offset-m4 offset-l2">
+    <h1 class="teal-text text-darken-3 center-align">Hi, {{ session['username'] }}</h1>
     {% if recipes|length != 0 %}
         <p>Here is a list of the recipes you created.</p>
         <ul class="collapsible">
             {% for r in recipes %}
             <li>
                 <div class="collapsible-header">
-                    <div class="col s12">
-                        {{ r.recipe_name }} || Views: {{ r.views }} | Created on: {{ r.time_created.strftime('%Y-%m-%d %H:%M:%S') }} | Last modified: {{ r.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}
-                    </div>
-                    <div class="col s12">
-                        <a href="{{ url_for('edit_recipe', recipe_id=r._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>
-                        <a data-target="{{ r._id }}" class="btn waves-effect waves-light red modal-trigger">Delete Recipe</a>
+                    <div class="row">
+                        <div class="col s12 m8">
+                        <span class="flow-text teal-text text-darken-3">{{ r.recipe_name }}</span> || Views: {{ r.views }} | Created on: {{ r.time_created.strftime('%Y-%m-%d %H:%M:%S') }} | Last modified: {{ r.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}
+                        </div>
+                        <div class="col s12 m4">
+                            <div class="right-align">
+                                <a href="{{ url_for('edit_recipe', recipe_id=r._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>
+                                <a data-target="{{ r._id }}" class="btn waves-effect waves-light red modal-trigger">Delete Recipe</a>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="collapsible-body">
@@ -47,9 +51,14 @@
                             </table>
                         </div>
                         <div class="col s12 m4">
-                            <h4>Allergens</h4> {% for a in r.allergens %}
-                            <div class="chip">{{ a }}</div>
-                            {% endfor %}
+                            <h4>Allergens</h4>
+                            {% if r.allergens|length > 0 %}
+                                {% for a in r.allergens %}
+                                    <div class="chip">{{ a }}</div>
+                                {% endfor %}
+                            {% else %}
+                                <h5>N/A</h5>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="row">
@@ -67,7 +76,7 @@
         <div class="modal" id="{{ r._id }}">
             <div class="modal-content">
                 <p>You are about to delete the following recipe:</p>
-                <p>{{ r.recipe_name }}</p>
+                <h1>{{ r.recipe_name }}</h1>
                 <p>Are you sure?</p>
             </div>
             <div class="modal-footer">
@@ -77,7 +86,7 @@
         </div>
         {% endfor %}
     {% else %}
-        <div class="center">
+        <div class="center-align">
             <h2>You have yet to add any recipes. Get started now!</h2>
             <a href="{{ url_for('add_recipe') }}" class="btn btn-large waves-effect waves-light">Add Recipe</a>
         </div>

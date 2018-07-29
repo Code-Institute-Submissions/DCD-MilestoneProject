@@ -1,14 +1,43 @@
 {% extends 'base.html' %} {% block content %}
-<div class="row">
-    <div class="col s12 m4 l2 index_layout hide-on-small-only">
-        <div class="background green lighten-5">
-            Test
+<div class="col s12 m8 l10 offset-m4 offset-l2 center-align">
+    <div class="row">
+        <div class="col s12 m10 offset-m1">
+            <h2>New Arrivals</h2>
+            <h6>New recipes coming in hot!</h6>
+            <div class="collection">
+            {% for n in new_arrivals %}
+                <a href="{{ url_for('view_recipe', recipe_id=n._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ n.recipe_name }}</span> by <span class="flow-text teal-text text-darken-3">{{ n.author }}</span> <span class="black-text">Created on: {{ n.time_created.strftime('%Y-%m-%d %H:%M:%S') }} UTC</span></a>
+            {% endfor %}
+            <a href="{{ url_for('new_arrivals') }}" class="collection-item"><span class="black-text">View More</span></a>
+            </div>
         </div>
     </div>
-    <div class="col s12 m8 l10 index_layout">
-        <div class="backgroud grey lighten-5">
-            Test 2
+
+    <div class="row">
+        <div class="col s12 m10 offset-m1">
+            <h2>Most Popular</h2>
+            <h6>Recipes with most views. Popularity is a sign of confidence!</h6>
+            <div class="collection">
+            {% for m in most_popular %}
+                <a href="{{ url_for('view_recipe', recipe_id=m._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ m.recipe_name }}</span> by <span class="flow-text teal-text text-darken-3">{{ m.author }}</span> <span class="black-text">Views: {{ m.views }}</span></a>
+            {% endfor %}
+            <a href="#" class="collection-item"><span class="black-text">View More</span></a>
+            </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col s12 m10 offset-m1">
+            <h2>Capricious Recipes</h2>
+            <h6>Recipes created by anonymous chefs. It could well be a hit or miss but definitely worth checking!</h6>
+            <div class="collection">
+            {% for r in random %}
+                <a href="{{ url_for('view_recipe', recipe_id=r._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ r.recipe_name }}</span></a>
+            {% endfor %}
+            <a href="#" class="collection-item"><span class="black-text">View More</span></a>
+            </div>
+        </div>
+    </div>
+    
 </div>
 {% endblock %}

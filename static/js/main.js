@@ -15,8 +15,8 @@ $(document).ready(function() {
 
         $(".cuisine:last").after('<div class="cuisine" id="cuisine_' + next + '"></div>');
         $('#cuisine_' + next).append(
-            '<input type="text" name="cuisine_' + next + '" placeholder="Cuisine" minlength="2" maxlength="20" class="col s8" required/>' +
-            '<a class="btn waves-effect waves-light red remove_cuisine col s4" id="remove_' + next + '"><i class="material-icons">remove</i></a>'
+            '<input type="text" name="cuisine_' + next + '" placeholder="Cuisine" minlength="2" maxlength="20" class="col s9" required/>' +
+            '<a class="btn waves-effect waves-light red remove_cuisine col s3" id="remove_' + next + '"><i class="material-icons">remove</i></a>'
         );
     });
     
@@ -60,8 +60,8 @@ $(document).ready(function() {
 
         $(".instruction:last").after('<div class="instruction" id="instruction_' + next + '"></div>');
         $("#instruction_" + next).append(
-            '<textarea class="materialize-textarea col s10" placeholder="Instruction" name="instruction_' + next + '"></textarea>' +
-            '<a class="btn waves-effect waves-light red col s2 remove_instruction" id="remove_' + next + '"><i class="material-icons">remove</i></a>'
+            '<textarea class="materialize-textarea col s9 m10 l11" placeholder="Instruction" name="instruction_' + next + '"></textarea>' +
+            '<a class="btn waves-effect waves-light red col s3 m2 l1 remove_instruction" id="remove_' + next + '"><i class="material-icons">remove</i></a>'
         );
     });
 

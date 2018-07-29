@@ -18,8 +18,10 @@ nav .brand-logo {
 	display: block;
 }
 
-.index_layout {
-    padding: 0 !important;
+#side_bar {
+    border: 0;
+    height: 100vh;
+    position: fixed;
 }
 
 /* To override styling in materializecss */

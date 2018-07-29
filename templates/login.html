@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 
-<div class="container">
+<div class="col s12 m8 l10 offset-m4 offset-l2">
     <h2>User Login</h2>
     <div class="row">
         <form class="col s12" method="POST" action="/login">
@@ -25,7 +25,7 @@
             {% endwith %}
 
             <div class="input-field col s12">
-                <button class="waves-effect waves-light btn" type="submit"><i class="material-icons right">send</i>Login</button>
+                <button class="waves-effect waves-light btn btn-large" type="submit"><i class="material-icons right">send</i>Login</button>
             </div>
         </form>
         

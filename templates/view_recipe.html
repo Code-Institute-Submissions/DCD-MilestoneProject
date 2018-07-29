@@ -1,5 +1,5 @@
 {% extends 'base.html' %} {% block content %}
-<div class="container">
+<div class="col s12 m8 l10 offset-m4 offset-l2">
     <h3>
         {{ recipe.recipe_name }} <span class="subtext">by {{ recipe.author }}    Views: {{ recipe.views }}</span>
         {% if 'username' in session and session['username'] == recipe.author %}
@@ -40,9 +40,14 @@
             </table>
         </div>
         <div class="col s12 m4">
-            <h4>Allergens</h4> {% for a in recipe.allergens %}
-            <div class="chip">{{ a }}</div>
-            {% endfor %}
+            <h4>Allergens</h4>
+            {% if recipe.allergens|length > 0 %}
+                {% for a in recipe.allergens %}
+                    <div class="chip">{{ a }}</div>
+                {% endfor %}
+            {% else %}
+                <h5>N/A</h5>
+            {% endif %}
         </div>
     </div>
     <div class="row">
@@ -53,8 +58,8 @@
         </div>
     </div>
     <div class="row">
-        <p>Created on: {{ recipe.time_created.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-        <p>Last modified: {{ recipe.last_modified.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        <p>Created on: {{ recipe.time_created.strftime('%Y-%m-%d %H:%M:%S') }} UTC</p>
+        <p>Last modified: {{ recipe.last_modified.strftime('%Y-%m-%d %H:%M:%S') }} UTC</p>
     </div>
     <div class="modal" id="view_recipe_modal">
         <div class="modal-content">
