@@ -29,7 +29,11 @@ class UserForm(FlaskForm):
     
 @app.route('/')
 def index():
-    return render_template('index.html')
+    new_arrivals = mongo.db.recipes.find().sort([('time_created', -1)]).limit(5)
+    most_popular = mongo.db.recipes.find().sort([('views', -1)]).limit(5)
+    random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)]).limit(5)
+    random = [r for r in random_pointer]
+    return render_template('index.html', new_arrivals=new_arrivals, most_popular=most_popular, random=random)
     
 @app.route('/login', methods=['GET',  'POST'])
 def login():
@@ -186,7 +190,7 @@ def delete_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
     if 'username' in session and session['username'] == recipe['author']:
         mongo.db.recipes.remove({"_id": ObjectId(recipe_id)})
-        return redirect('/')
+        return redirect(url_for('user_page', user_name=recipe['author']))
 
     return "You are not authorised to delete this recipe."
 
@@ -198,6 +202,11 @@ def user_page(user_name):
         return render_template('user_page.html', recipes=recipes)
 
     return redirect('/')
+
+@app.route('/new_arrivals')
+def new_arrivals():
+    new_arrivals = mongo.db.recipes.find().sort([('time_created', -1)]).limit(20)
+    return render_template('new_arrivals.html', new_arrivals=new_arrivals)
 
 if __name__ == '__main__':
     if __name__ == '__main__':
