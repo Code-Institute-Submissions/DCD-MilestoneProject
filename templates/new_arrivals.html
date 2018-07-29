@@ -1,0 +1,17 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="col s12 m8 l10 offset-m4 offset-l2 center-align">
+	<div class="row">
+        <div class="col s12 m10 offset-m1">
+            <h2>New Arrivals</h2>
+            <h6>New recipes coming in hot!</h6>
+            <div class="collection">
+            {% for n in new_arrivals %}
+                <a href="{{ url_for('view_recipe', recipe_id=n._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ n.recipe_name }}</span> by <span class="flow-text teal-text text-darken-3">{{ n.author }}</span> <span class="black-text">Created on: {{ n.time_created.strftime('%Y-%m-%d %H:%M:%S') }} UTC</span></a>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
