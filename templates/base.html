@@ -37,8 +37,8 @@
     <div class="row">
         <div class="col s12 m4 l2 index_layout hide-on-small-only collection" id="side_bar">
             <a href="{{ url_for('new_arrivals') }}" class="collection-item">New Arrivals</a>
-            <a href="#" class="collection-item">Most Popular</a>
-            <a href="#" class="collection-item">Capricious Recipes</a>
+            <a href="{{ url_for('most_popular') }}" class="collection-item">Most Popular</a>
+            <a href="{{ url_for('guest_recipes') }}" class="collection-item">Capricious Recipes</a>
             <a href="#" class="collection-item">View Recipes by Cuisines</a>
             <a href="#" class="collection-item">View Recipes by Country of Origin</a>
             <a href="#" class="collection-item">View Recipes by Ingredients</a>
@@ -63,8 +63,8 @@
 
         <li><a href="{{ url_for('add_recipe') }}">Add Recipe</a></li>
         <li><a href="{{ url_for('new_arrivals') }}">New Arrivals</a></li>
-        <li><a href="#">Most Popular</a></li>
-        <li><a href="#">Capricious Recipes</a></li>
+        <li><a href="{{ url_for('most_popular') }}">Most Popular</a></li>
+        <li><a href="{{ url_for('guest_recipes') }}">Capricious Recipes</a></li>
         <li><a href="#">View Recipes by Cuisines</a></li>
         <li><a href="#">View Recipes by Country of Origin</a></li>
         <li><a href="#">View Recipes by Ingredients</a></li>

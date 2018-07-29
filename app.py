@@ -208,6 +208,17 @@ def new_arrivals():
     new_arrivals = mongo.db.recipes.find().sort([('time_created', -1)]).limit(20)
     return render_template('new_arrivals.html', new_arrivals=new_arrivals)
 
+@app.route('/most_popular')
+def most_popular():
+    most_popular = mongo.db.recipes.find().sort([('views', -1)]).limit(20)
+    return render_template('most_popular.html', most_popular=most_popular)
+
+@app.route('/guest_recipes')
+def guest_recipes():
+    random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)]).limit(5)
+    random = [r for r in random_pointer]
+    return render_template('guest_recipes.html', random=random)
+
 if __name__ == '__main__':
     if __name__ == '__main__':
         # app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=True, threaded=True)
