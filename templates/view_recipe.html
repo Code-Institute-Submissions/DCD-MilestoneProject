@@ -1,7 +1,20 @@
 {% extends 'base.html' %} {% block content %}
 <div class="col s12 m8 l10 offset-m4 offset-l2">
     <h3>
-        {{ recipe.recipe_name }} <span class="subtext">by {{ recipe.author }}    Views: {{ recipe.views }}</span>
+        {{ recipe.recipe_name }} <span class="subtext">by</span> {{ recipe.author }}
+        <span class="subtext">
+            Views: {{ recipe.views }}    
+            Likes: {{ recipe.upvote_count }}
+        </span>
+        {% if 'username' in session %}
+            <a href="{{ url_for('upvote', recipe_id=recipe._id) }}">
+                {% if session['username'] not in recipe.upvote %}
+                    <i class="medium material-icons grey-text text-lighten-1">thumb_up</i>
+                {% else %}
+                    <i class="medium material-icons green-text text-lighten-1">thumb_up</i>
+                {% endif %}
+            </a>
+        {% endif %}
         {% if 'username' in session and session['username'] == recipe.author %}
             <span class="right">
                 <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>

@@ -31,9 +31,10 @@ class UserForm(FlaskForm):
 def index():
     new_arrivals = mongo.db.recipes.find().sort([('time_created', -1)]).limit(5)
     most_popular = mongo.db.recipes.find().sort([('views', -1)]).limit(5)
+    most_upvote = mongo.db.recipes.find().sort([('upvote_count', -1)]).limit(5)
     random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)]).limit(5)
     random = [r for r in random_pointer]
-    return render_template('index.html', new_arrivals=new_arrivals, most_popular=most_popular, random=random)
+    return render_template('index.html', new_arrivals=new_arrivals, most_popular=most_popular, most_upvote=most_upvote, random=random)
     
 @app.route('/login', methods=['GET',  'POST'])
 def login():
@@ -122,14 +123,28 @@ def insert_recipe():
         "instructions": instructions, # A dictionary
         "author": author,
         "views": 0,
-        "upvote": 0,
+        "upvote": [],
+        "upvote_count": 0,
         "time_created": datetime.utcnow(),
         "last_modified": datetime.utcnow()
     }
     
     recipes.insert_one(data)
+
+    # Since id is auto generated and there is no way to retrieve it at this point 
+    # so using exact parameters user just given to find the newly created recipe and redirect to that
+
+    recipe = mongo.db.recipes.find_one({
+        "recipe_name": request.form['name'],
+        "origin": request.form['origin'],
+        "cuisine": cuisines, # A list
+        "ingredients": ingredients_unit, # A dictionary
+        "allergens": request.form.getlist('allergens'),
+        "instructions": instructions, # A dictionary
+        "author": author
+        })
     
-    return redirect('/')
+    return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
 
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
@@ -175,10 +190,6 @@ def update_recipe(recipe_id):
                     "ingredients": ingredients_unit, # A dictionary
                     "allergens": request.form.getlist('allergens'),
                     "instructions": instructions,
-                    "author": recipe['author'],
-                    "views": recipe['views'],
-                    "upvote": recipe['upvote'],
-                    "time_created": recipe['time_created'],
                     "last_modified": datetime.utcnow()
                 }})
 
@@ -189,10 +200,26 @@ def update_recipe(recipe_id):
 def delete_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
     if 'username' in session and session['username'] == recipe['author']:
-        mongo.db.recipes.remove({"_id": ObjectId(recipe_id)})
+        mongo.db.recipes.delete_one({"_id": ObjectId(recipe_id)})
         return redirect(url_for('user_page', user_name=recipe['author']))
 
     return "You are not authorised to delete this recipe."
+
+@app.route('/upvote/<recipe_id>', methods=['GET', 'POST'])
+def upvote(recipe_id):
+    recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    if 'username' in session and session['username'] not in recipe['upvote']:
+        recipe['upvote'].append(session['username'])
+    elif 'username' in session and session['username'] in recipe['upvote']:
+        recipe['upvote'].remove(session['username'])
+
+    mongo.db.recipes.update_one({"_id": ObjectId(recipe_id)},
+            { '$set': {
+                "upvote": recipe['upvote'],
+                "upvote_count": len(recipe['upvote'])
+            }})
+
+    return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
 
 @app.route('/user/<user_name>')
 def user_page(user_name):
@@ -213,9 +240,14 @@ def most_popular():
     most_popular = mongo.db.recipes.find().sort([('views', -1)]).limit(20)
     return render_template('most_popular.html', most_popular=most_popular)
 
+@app.route('/most_upvote')
+def most_upvote():
+    most_upvote = mongo.db.recipes.find().sort([('upvote_count', -1)]).limit(5)
+    return render_template('most_upvote.html', most_upvote=most_upvote)
+
 @app.route('/guest_recipes')
 def guest_recipes():
-    random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)]).limit(5)
+    random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)]).limit(20)
     random = [r for r in random_pointer]
     return render_template('guest_recipes.html', random=random)
 

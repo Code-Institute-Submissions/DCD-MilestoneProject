@@ -28,6 +28,19 @@
 
     <div class="row">
         <div class="col s12 m10 offset-m1">
+            <h2>Most Likes</h2>
+            <h6>Recipes with most likes. These are what our users recommend!</h6>
+            <div class="collection">
+            {% for m in most_upvote %}
+                <a href="{{ url_for('view_recipe', recipe_id=m._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ m.recipe_name }}</span> by <span class="flow-text teal-text text-darken-3">{{ m.author }}</span> <span class="black-text">Likes: {{ m.upvote_count }}</span></a>
+            {% endfor %}
+            <a href="{{ url_for('most_upvote') }}" class="collection-item"><span class="black-text">View More</span></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col s12 m10 offset-m1">
             <h2>Capricious Recipes</h2>
             <h6>Recipes created by anonymous chefs. It could well be a hit or miss but definitely worth checking!</h6>
             <div class="collection">
