@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 <div class="col s12 m8 l10 offset-m4 offset-l2">
     <h3>
-        {{ recipe.recipe_name }} <span class="subtext">by</span> {{ recipe.author }}
+        {{ recipe.recipe_name.title() }} <span class="subtext">by</span> {{ recipe.author }}
         <span class="subtext">
             Views: {{ recipe.views }}    
             Likes: {{ recipe.upvote_count }}
@@ -27,9 +27,8 @@
             <h4>Country of origin</h4> {{ recipe.origin }}
         </div>
         <div class="col s12 m4">
-            <h4>Cuisine</h4> {% for c in recipe.cuisine %}
-            <div class="chip">{{ c }}</div>
-            {% endfor %}
+            <h4>Cuisine</h4>
+            <div class="chip">{{ recipe.cuisine }}</div>
         </div>
     </div>
     <div class="row">
@@ -45,8 +44,8 @@
                 <tbody>
                     {% for key, val in recipe.ingredients.items() %}
                     <tr>
-                        <td>{{ key }}</td>
-                        <td>{{ val }}</td>
+                        <td>{{ key.title() }}</td>
+                        <td>{{ val.title() }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -77,7 +76,7 @@
     <div class="modal" id="view_recipe_modal">
         <div class="modal-content">
             <p>You are about to delete the following recipe:</p>
-            <p>{{ recipe.recipe_name }}</p>
+            <p>{{ recipe.recipe_name.title() }}</p>
             <p>Are you sure?</p>
         </div>
         <div class="modal-footer">

@@ -7,7 +7,7 @@
             <h6>Recipes with most views. Popularity is a sign of confidence!</h6>
             <div class="collection">
             {% for m in most_popular %}
-                <a href="{{ url_for('view_recipe', recipe_id=m._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ m.recipe_name }}</span> by <span class="flow-text teal-text text-darken-3">{{ m.author }}</span> <span class="black-text">Views: {{ m.views }}</span></a>
+                <a href="{{ url_for('view_recipe', recipe_id=m._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ m.recipe_name.title() }}</span> by <span class="flow-text teal-text text-darken-3">{{ m.author }}</span> <span class="black-text">Views: {{ m.views }}</span></a>
             {% endfor %}
             </div>
         </div>

@@ -12,18 +12,17 @@
             </div>
             <div class="row">
                 <div class="input-field col s12 m5">
-                    <div id="cuisines_container">
-                        {% for c in recipe.cuisine %}
-                        <div class="cuisine" id="cuisine_{{ loop.index }}">
-                            <input type="text" name="cuisine_{{ loop.index }}" placeholder="Cuisine" minlength="2" maxlength="20" class="col s8" required value="{{ c }}"/>
-                            {% if loop.index == 1 %}
-                            <a class="btn waves-effect waves-light add_cuisine col s4"><i class="material-icons">add</i></a>
+                    <select id="cuisine" name="cuisine" data-live-search="true" required>
+                        <option disabled selected>Choose Cuisine (Type in country name to speed up search)</option>
+                        {% for c in cuisines %}
+                            {% if c.country == recipe.origin %}
+                                <option value="{{ c.cuisine }}" selected>{{ c.cuisine }}</option>
                             {% else %}
-                            <a class="btn waves-effect waves-light red remove_cuisine col s4" id="remove_{{ loop.index }}"><i class="material-icons">remove</i></a>
+                                <option value="{{ c.cuisine }}">{{ c.cuisine }}</option>
                             {% endif %}
-                        </div>
                         {% endfor %}
-                    </div>
+                    </select>
+                    <label>Cuisine</label>
                 </div>
                 <div class="input-field col s12 m7">
                     <select id="origin" name="origin" data-live-search="true" required>

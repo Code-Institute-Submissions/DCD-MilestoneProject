@@ -12,12 +12,13 @@
             </div>
             <div class="row">
                 <div class="input-field col s12 m5">
-                    <div id="cuisines_container">
-                        <div class="cuisine" id="cuisine_1">
-                            <input type="text" name="cuisine_1" placeholder="Cuisine" minlength="2" maxlength="20" class="col s9" required/>
-                            <a class="btn waves-effect waves-light add_cuisine col s3"><i class="material-icons">add</i></a>
-                        </div>
-                    </div>
+                    <select id="cuisine" name="cuisine" data-live-search="true" required>
+                        <option value="" disabled selected>Choose Cuisine (Type in country name to speed up search)</option>
+                        {% for c in cuisines %}
+                            <option value="{{ c.cuisine }}">{{ c.cuisine }}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Cuisine</label>
                 </div>
                 <div class="input-field col s12 m7">
                     <select id="origin" name="origin" data-live-search="true" required>

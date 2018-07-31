@@ -14,14 +14,6 @@ app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds243041.mlab.com:43041/dcd-
 
 mongo = PyMongo(app)
 
-def categorise(category_name, user_input):
-    output = []
-    for key, val in user_input.items():
-        if category_name in key:
-            output.append(val)
-    
-    return output
-
 class UserForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(max=20)])
     password = PasswordField('password', validators=[InputRequired(), Length(max=20)])
@@ -29,12 +21,7 @@ class UserForm(FlaskForm):
     
 @app.route('/')
 def index():
-    new_arrivals = mongo.db.recipes.find().sort([('time_created', -1)]).limit(5)
-    most_popular = mongo.db.recipes.find().sort([('views', -1)]).limit(5)
-    most_upvote = mongo.db.recipes.find().sort([('upvote_count', -1)]).limit(5)
-    random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)]).limit(5)
-    random = [r for r in random_pointer]
-    return render_template('index.html', new_arrivals=new_arrivals, most_popular=most_popular, most_upvote=most_upvote, random=random)
+    return render_template('index.html')
     
 @app.route('/login', methods=['GET',  'POST'])
 def login():
@@ -79,7 +66,7 @@ def logout():
     
 @app.route('/add_recipe')
 def add_recipe():
-    return render_template('add_recipe.html', countries=mongo.db.countries.find(), allergens=mongo.db.allergens.find())
+    return render_template('add_recipe.html', cuisines=mongo.db.cuisines.find() ,countries=mongo.db.countries.find(), allergens=mongo.db.allergens.find())
     
 @app.route('/insert_recipe', methods=['POST'])
 def insert_recipe():
@@ -88,17 +75,14 @@ def insert_recipe():
     # Reorganise all data before inserting into database
     user_input = request.form.to_dict()
     
-    # Separate cuisines into a separate list
-    cuisines = categorise('cuisine', user_input)
-    
     # Separate ingredients into a separate dictionary
     ingredients = []
     unit = []
     for key, val in user_input.items():
         if 'ingredient' in key:
-            ingredients.append(val)
+            ingredients.append(val.lower())
         if 'unit' in key:
-            unit.append(val)
+            unit.append(val.lower())
             
     ingredients_unit = {}
     for x in range(0, len(ingredients)):
@@ -115,9 +99,9 @@ def insert_recipe():
     
     # Reorganise all data into one dictionary before inserting into database
     data = {
-        "recipe_name": request.form['name'],
+        "recipe_name": request.form['name'].lower(),
         "origin": request.form['origin'],
-        "cuisine": cuisines, # A list
+        "cuisine": request.form['cuisine'],
         "ingredients": ingredients_unit, # A dictionary
         "allergens": request.form.getlist('allergens'),
         "instructions": instructions, # A dictionary
@@ -132,12 +116,13 @@ def insert_recipe():
     recipes.insert_one(data)
 
     # Since id is auto generated and there is no way to retrieve it at this point 
-    # so using exact parameters user just given to find the newly created recipe and redirect to that
+    # so using exact parameters user just given to find the newly created recipe and retrieve id from the record found,
+    # Then use the id for redirect to view_recipe.
 
     recipe = mongo.db.recipes.find_one({
         "recipe_name": request.form['name'],
         "origin": request.form['origin'],
-        "cuisine": cuisines, # A list
+        "cuisine": request.form['cuisine'],
         "ingredients": ingredients_unit, # A dictionary
         "allergens": request.form.getlist('allergens'),
         "instructions": instructions, # A dictionary
@@ -156,7 +141,7 @@ def edit_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
     # Only allows users to update recipes they created.
     if 'username' in session and session['username'] == recipe['author']:
-        return render_template('edit_recipe.html', recipe=recipe, countries=mongo.db.countries.find(), allergens=mongo.db.allergens.find())
+        return render_template('edit_recipe.html', recipe=recipe, cuisines=mongo.db.cuisines.find(), countries=mongo.db.countries.find(), allergens=mongo.db.allergens.find())
 
     return redirect('/')
 
@@ -164,7 +149,6 @@ def edit_recipe(recipe_id):
 def update_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
     user_input = request.form.to_dict()
-    cuisines = categorise('cuisine', user_input)
     ingredients = []
     unit = []
     for key, val in user_input.items():
@@ -186,7 +170,7 @@ def update_recipe(recipe_id):
         { '$set': {
                     "recipe_name": request.form['name'],
                     "origin": request.form['origin'],
-                    "cuisine": cuisines, # A list
+                    "cuisine": request.form['cuisine'],
                     "ingredients": ingredients_unit, # A dictionary
                     "allergens": request.form.getlist('allergens'),
                     "instructions": instructions,
@@ -232,24 +216,28 @@ def user_page(user_name):
 
 @app.route('/new_arrivals')
 def new_arrivals():
-    new_arrivals = mongo.db.recipes.find().sort([('time_created', -1)]).limit(20)
+    new_arrivals = mongo.db.recipes.find().sort([('time_created', -1)])
     return render_template('new_arrivals.html', new_arrivals=new_arrivals)
 
 @app.route('/most_popular')
 def most_popular():
-    most_popular = mongo.db.recipes.find().sort([('views', -1)]).limit(20)
+    most_popular = mongo.db.recipes.find().sort([('views', -1)])
     return render_template('most_popular.html', most_popular=most_popular)
 
 @app.route('/most_upvote')
 def most_upvote():
-    most_upvote = mongo.db.recipes.find().sort([('upvote_count', -1)]).limit(5)
+    most_upvote = mongo.db.recipes.find().sort([('upvote_count', -1)])
     return render_template('most_upvote.html', most_upvote=most_upvote)
 
 @app.route('/guest_recipes')
 def guest_recipes():
-    random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)]).limit(20)
+    random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)])
     random = [r for r in random_pointer]
     return render_template('guest_recipes.html', random=random)
+
+@app.route('/recipes_by_cuisines')
+def recipes_by_cuisines():
+    return render_template('recipes_by_cuisines.html')
 
 if __name__ == '__main__':
     if __name__ == '__main__':

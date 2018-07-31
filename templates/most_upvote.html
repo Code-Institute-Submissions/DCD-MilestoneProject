@@ -7,7 +7,7 @@
             <h6>Recipes with most likes. These are what our users recommend!</h6>
             <div class="collection">
             {% for m in most_upvote %}
-                <a href="{{ url_for('view_recipe', recipe_id=m._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ m.recipe_name }}</span> by <span class="flow-text teal-text text-darken-3">{{ m.author }}</span> <span class="black-text">Likes: {{ m.upvote_count }}</span></a>
+                <a href="{{ url_for('view_recipe', recipe_id=m._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ m.recipe_name.title() }}</span> by <span class="flow-text teal-text text-darken-3">{{ m.author }}</span> <span class="black-text">Likes: {{ m.upvote_count }}</span></a>
             {% endfor %}
             </div>
         </div>
