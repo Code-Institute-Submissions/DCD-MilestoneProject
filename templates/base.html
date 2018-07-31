@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/materialize.min.css') }}" type="text/css" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" type="text/css" />
+
     <title>Cooking Online</title>
 </head>
 
@@ -40,9 +41,6 @@
             <a href="{{ url_for('most_popular') }}" class="collection-item">Most Popular</a>
             <a href="{{ url_for('most_upvote') }}" class="collection-item">Most Likes</a>
             <a href="{{ url_for('guest_recipes') }}" class="collection-item">Capricious Recipes</a>
-            <a href="{{ url_for('recipes_by_cuisines') }}" class="collection-item">View Recipes by Cuisines</a>
-            <a href="#" class="collection-item">View Recipes by Country of Origin</a>
-            <a href="#" class="collection-item">View Recipes by Ingredients</a>
             <a href="#" class="collection-item">Custom Search</a>
         </div>
 
@@ -67,9 +65,6 @@
         <li><a href="{{ url_for('most_popular') }}">Most Popular</a></li>
         <li><a href="{{ url_for('most_upvote') }}">Most Likes</a></li>
         <li><a href="{{ url_for('guest_recipes') }}">Capricious Recipes</a></li>
-        <li><a href="{{ url_for('recipes_by_cuisines') }}">View Recipes by Cuisines</a></li>
-        <li><a href="#">View Recipes by Country of Origin</a></li>
-        <li><a href="#">View Recipes by Ingredients</a></li>
         <li><a href="#">Custom Search</a></li>
 
         {% if 'username' in session %}
@@ -80,7 +75,11 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/materialize.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/d3/4.7.2/d3.min.js"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/d3pie.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+    {% block script %}{% endblock %}
 </body>
 
 </html>

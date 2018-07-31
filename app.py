@@ -14,6 +14,22 @@ app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds243041.mlab.com:43041/dcd-
 
 mongo = PyMongo(app)
 
+def count_cuisines():
+    cuisine_count = {}
+    for c in mongo.db.cuisines.find():
+        if mongo.db.recipes.count_documents({"cuisine": c['cuisine']}) != 0:
+            cuisine_count[c['cuisine']] = mongo.db.recipes.count_documents({"cuisine": c['cuisine']})
+
+    return cuisine_count
+
+def count_origins():
+    origin_count = {}
+    for c in mongo.db.countries.find():
+        if mongo.db.recipes.count_documents({"origin": c['country']}) != 0:
+            origin_count[c['country']] = mongo.db.recipes.count_documents({"origin": c['country']})
+
+    return origin_count
+
 class UserForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(max=20)])
     password = PasswordField('password', validators=[InputRequired(), Length(max=20)])
@@ -21,10 +37,13 @@ class UserForm(FlaskForm):
     
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html', cuisine_count=count_cuisines(), origin_count=count_origins())
     
 @app.route('/login', methods=['GET',  'POST'])
 def login():
+    if 'username' in session:
+        return redirect('/')
+
     form = UserForm()
     
     if form.validate_on_submit():
@@ -40,6 +59,9 @@ def login():
     
 @app.route('/register', methods=['GET',  'POST'])
 def register():
+    if 'username' in session:
+        return redirect('/')
+
     form = UserForm()
     
     if form.validate_on_submit():
@@ -235,11 +257,12 @@ def guest_recipes():
     random = [r for r in random_pointer]
     return render_template('guest_recipes.html', random=random)
 
-@app.route('/recipes_by_cuisines')
-def recipes_by_cuisines():
-    return render_template('recipes_by_cuisines.html')
+@app.route('/recipes_by_cuisine/<cuisine>')
+def recipes_by_cuisine(cuisine):
+    pointer = mongo.db.recipes.find({"cuisine": cuisine})
+    recipes = [p for p in pointer]
+    return render_template('recipes_by_cuisine.html', cuisine_count=count_cuisines(), recipes=recipes)
 
 if __name__ == '__main__':
-    if __name__ == '__main__':
-        # app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=True, threaded=True)
-        app.run(debug=True, threaded=True)
+    # app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=True, threaded=True)
+    app.run(debug=True, threaded=True)
