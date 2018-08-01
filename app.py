@@ -15,18 +15,14 @@ app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds243041.mlab.com:43041/dcd-
 mongo = PyMongo(app)
 
 def count_cuisines():
-    cuisine_count = {}
-    for c in mongo.db.cuisines.find():
-        if mongo.db.recipes.count_documents({"cuisine": c['cuisine']}) != 0:
-            cuisine_count[c['cuisine']] = mongo.db.recipes.count_documents({"cuisine": c['cuisine']})
+    pointers = mongo.db.recipes.aggregate([{"$group": {'_id': '$cuisine', 'value':{'$sum':1}}}])
+    cuisine_count = [{"label": p['_id'], "value": p['value']} for p in pointers]
 
     return cuisine_count
 
 def count_origins():
-    origin_count = {}
-    for c in mongo.db.countries.find():
-        if mongo.db.recipes.count_documents({"origin": c['country']}) != 0:
-            origin_count[c['country']] = mongo.db.recipes.count_documents({"origin": c['country']})
+    pointers = mongo.db.recipes.aggregate([{"$group": {'_id': '$origin', 'value':{'$sum':1}}}])
+    origin_count = [{"label": p['_id'], "value": p['value']} for p in pointers]
 
     return origin_count
 
@@ -261,7 +257,19 @@ def guest_recipes():
 def recipes_by_cuisine(cuisine):
     pointer = mongo.db.recipes.find({"cuisine": cuisine})
     recipes = [p for p in pointer]
-    return render_template('recipes_by_cuisine.html', cuisine_count=count_cuisines(), recipes=recipes)
+    if len(recipes) == 0:
+        return redirect('/')
+    
+    return render_template('recipes_by_cuisine.html', cuisine_count=count_cuisines(), cuisine=cuisine, recipes=recipes)
+
+@app.route('/recipes_by_origin/<origin>')
+def recipes_by_origin(origin):
+    pointer = mongo.db.recipes.find({"origin": origin})
+    recipes = [p for p in pointer]
+    if len(recipes) == 0:
+        return redirect('/')
+    
+    return render_template('recipes_by_origin.html', origin_count=count_origins(), origin=origin, recipes=recipes)
 
 if __name__ == '__main__':
     # app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=True, threaded=True)

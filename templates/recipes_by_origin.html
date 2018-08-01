@@ -1,11 +1,11 @@
 {% extends 'base.html' %} {% block content %}
 <div class="col s12 m12 l10 offset-l2 center-align">
     <div class="row">
-        <div class="col s12" id="cuisine_pie"></div>
+        <div class="col s12" id="origin_pie"></div>
     </div>
     <div class="row">
         <div class="col s12 m10 offset-m1">
-            <h2>{{ cuisine }} Recipes</h2>
+            <h2>Recipes from {{ origin }} </h2>
             <div class="collection">
             {% for r in recipes %}
                 <a href="{{ url_for('view_recipe', recipe_id=r._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ r.recipe_name.title() }}</span> by <span class="flow-text teal-text text-darken-3">{{ r.author }}</span> <span class="black-text">Created on: {{ r.time_created.strftime('%Y-%m-%d %H:%M:%S') }} UTC</span></a>
@@ -18,19 +18,19 @@
 
 {% block script %}
 <script>
-    var pie = new d3pie("cuisine_pie", {
+    var pie = new d3pie("origin_pie", {
         header: {
             title: {
-                text: "Recipes by Cuisine",
+                text: "Recipes by Country of Origin",
                 fontSize: 24
             }
         },
         data: {
-            content: {{ cuisine_count|tojson }}
+            content: {{ origin_count|tojson }}
         },
         callbacks: {
             onClickSegment: function(a) {
-                loc = "{{ url_for('recipes_by_cuisine', cuisine="") }}" + a.data.label
+                loc = "{{ url_for('recipes_by_origin', origin="") }}" + a.data.label
                 location.href = loc
             }
         }

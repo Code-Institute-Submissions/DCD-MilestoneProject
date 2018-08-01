@@ -22,16 +22,12 @@
             }
         },
         data: {
-            content: [
-                {% for key, val in cuisine_count.items() %}
-                    { label: '{{ key }}', value: {{ val }} },
-                {% endfor %}
-            ]
+            content: {{ cuisine_count|tojson }}
         },
         callbacks: {
             onClickSegment: function(a) {
-                loc = "{{ url_for('recipes_by_cuisine', cuisine=cuisine) }}" + a.data.label
-                location.href = loc
+                loc = "{{ url_for('recipes_by_cuisine', cuisine="") }}" + a.data.label;
+                location.href = loc;
             }
         }
     });
@@ -44,15 +40,12 @@
             }
         },
         data: {
-            content: [
-                {% for key, val in origin_count.items() %}
-                    { label: '{{ key }}', value: {{ val }} },
-                {% endfor %}
-            ]
+            content: {{ origin_count|tojson }}
         },
         callbacks: {
             onClickSegment: function(a) {
-                console.log(a.data.label);
+                loc = "{{ url_for('recipes_by_origin', origin="") }}" + a.data.label;
+                location.href = loc;
             }
         }
     });
