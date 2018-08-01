@@ -271,6 +271,11 @@ def recipes_by_origin(origin):
     
     return render_template('recipes_by_origin.html', origin_count=count_origins(), origin=origin, recipes=recipes)
 
+@app.route('/all_recipes')
+def all_recipes():
+    recipes = mongo.db.recipes.find().sort([('last_modified', -1)])
+    return render_template('all_recipes.html', recipes=recipes)
+
 if __name__ == '__main__':
     # app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=True, threaded=True)
     app.run(debug=True, threaded=True)

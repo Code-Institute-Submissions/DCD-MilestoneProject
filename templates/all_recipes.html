@@ -1,0 +1,17 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="col s12 m12 l10 offset-l2 center-align">
+	<div class="row">
+        <div class="col s12 m10 offset-m1">
+            <h2>All Recipes</h2>
+            <h6>Everything we've got to offer right now, take your time and have a look!</h6>
+            <div class="collection">
+            {% for r in recipes %}
+                <a href="{{ url_for('view_recipe', recipe_id=r._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ r.recipe_name.title() }}</span> by <span class="flow-text teal-text text-darken-3">{{ r.author }}</span> <span class="black-text">Last Modified: {{ r.last_modified.strftime('%Y-%m-%d %H:%M:%S') }} UTC</span></a>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
