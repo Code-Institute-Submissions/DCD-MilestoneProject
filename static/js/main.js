@@ -3,28 +3,8 @@ $(document).ready(function() {
     $('select').formSelect();
     $('.chips').chips();
     $('.tooltipped').tooltip();
-
-    $('.add_cuisine').click(function() {
-
-        var last = $(".cuisine:last").attr("id");
-        var split_id = last.split("_");
-        var next = Number(split_id[1]) + 1;
-
-        $(".cuisine:last").after('<div class="cuisine" id="cuisine_' + next + '"></div>');
-        $('#cuisine_' + next).append(
-            '<input type="text" name="cuisine_' + next + '" placeholder="Cuisine" minlength="2" maxlength="20" class="col s9" required/>' +
-            '<a class="btn waves-effect waves-light red remove_cuisine col s3" id="remove_' + next + '"><i class="material-icons">remove</i></a>'
-        );
-    });
-    
-     $('#cuisines_container').on('click', '.remove_cuisine', function() {
-        var id = this.id;
-        var split_id = id.split("_");
-        var deleteindex = split_id[1];
-
-        $("#cuisine_" + deleteindex).remove();
-
-    });
+    $('.collapsible').collapsible();
+    $('.modal').modal();
 
     $('.add_ingredient').click(function() {
 
@@ -71,6 +51,25 @@ $(document).ready(function() {
 
     });
     
-    $('.collapsible').collapsible();
-    $('.modal').modal();
+    $('.add_search_ingredient').click(function() {
+
+        var last = $(".ingredient:last").attr("id");
+        var split_id = last.split("_");
+        var next = Number(split_id[1]) + 1;
+
+        $(".ingredient:last").after('<div class="ingredient" id="search-ingredient_' + next + '"></div>');
+        $("#search-ingredient_" + next).append(
+            '<input type="text" name="ingredient_' + next + '" placeholder="Ingredient" class="col s9"/>' +
+            '<a class="btn waves-effect waves-light red col s3 remove_ingredient" id="remove_' + next + '"><i class="material-icons">remove</i></a>'
+        );
+    });
+
+    $('#search_ingredients_container').on('click', '.remove_ingredient', function() {
+        var id = this.id;
+        var split_id = id.split("_");
+        var deleteindex = split_id[1];
+
+        $("#search-ingredient_" + deleteindex).remove();
+
+    });    
 });

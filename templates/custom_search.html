@@ -1,0 +1,69 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="col s12 m12 l10 offset-l2">
+    <h3>Custom Search</h3>
+    <h6>Search for particular recipes with specific requirements</h6>
+    <div class="row">
+        <form action="{{ url_for('custom_search_process') }}" method="POST" class="col s12">
+            <div class="row">
+                <div class="input-field col s12">
+                    <input type="text" name="name" id="name" minlength="2" maxlength="20"/>
+                    <label for="name">Recipe Name</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m5">
+                    <select id="cuisine" name="cuisine" data-live-search="true">
+                        <option value="" disabled selected>Choose Cuisine (Type in country name to speed up search)</option>
+                        {% for c in cuisines %}
+                            <option value="{{ c.cuisine }}">{{ c.cuisine }}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Cuisine</label>
+                </div>
+                <div class="input-field col s12 m7">
+                    <select id="origin" name="origin" data-live-search="true">
+                        <option value="" disabled selected>Choose Country of Origin (Type in country name to speed up search)</option>
+                        {% for c in countries %}
+                            <option value="{{ c.country }}">{{ c.country }}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Country of Origin</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="intput-field col s12 m6">
+                    <div id="search_ingredients_container">
+                        <div class="ingredient" id="search-ingredient_1">
+                            <input type="text" name="ingredient_1" placeholder="Ingredient" class="col s9"/>
+                            <a class="btn waves-effect waves-light add_search_ingredient col s3" ><i class="material-icons">add</i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-field col s12 m6">
+                    <select id="allergens" name="allergens" data-live-search="true" multiple>
+                        <option value="" disabled>Choose Allergens</option>
+                        {% for a in allergens %}
+                            <option value="{{ a.allergen }}">{{ a.allergen }}</option>
+                        {% endfor %}
+                    </select>
+                    <label>Allergens</label>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="input-field col s12">
+                    <i class="material-icons prefix show-on-medium-and-up">person</i>
+                    <input type="text" name="author" id="author" maxlength="20"/>
+                    <label for="author">By</label>
+                </div>
+            </div>
+
+            <div class="input-field col s12">
+                <button class="waves-effect waves-light btn btn-large" type="submit"><i class="material-icons right">search</i>Start Search</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

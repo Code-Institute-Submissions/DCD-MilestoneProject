@@ -41,7 +41,7 @@
             <a href="{{ url_for('most_popular') }}" class="collection-item">Most Popular</a>
             <a href="{{ url_for('most_upvote') }}" class="collection-item">Most Likes</a>
             <a href="{{ url_for('guest_recipes') }}" class="collection-item">Capricious Recipes</a>
-            <a href="#" class="collection-item">Custom Search</a>
+            <a href="{{ url_for('custom_search') }}" class="collection-item">Custom Search</a>
         </div>
 
         {% block content %}{% endblock %}
@@ -65,7 +65,7 @@
         <li><a href="{{ url_for('most_popular') }}">Most Popular</a></li>
         <li><a href="{{ url_for('most_upvote') }}">Most Likes</a></li>
         <li><a href="{{ url_for('guest_recipes') }}">Capricious Recipes</a></li>
-        <li><a href="#">Custom Search</a></li>
+        <li><a href="{{ url_for('custom_search') }}">Custom Search</a></li>
 
         {% if 'username' in session %}
             <li><a href="{{ url_for('logout') }}">Logout</a></li>

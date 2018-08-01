@@ -1,0 +1,18 @@
+{% extends 'base.html' %} {% block content %}
+
+<div class="col s12 m12 l10 offset-l2 center-align">
+	<div class="row">
+        <div class="col s12 m10 offset-m1">
+            <h2>Search Results</h2>
+            <h6>Can't find what you need? Try changing your requirements.</h6>
+            <a href="{{ url_for('custom_search') }}" class="btn waves-effect waves-light"><i class="material-icons right">search</i>Search Again</a>
+            <div class="collection">
+            {% for r in results %}
+                <a href="{{ url_for('view_recipe', recipe_id=r._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ r.recipe_name.title() }}</span> by <span class="flow-text teal-text text-darken-3">{{ r.author }}</span></a>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

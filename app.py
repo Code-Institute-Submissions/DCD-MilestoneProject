@@ -276,6 +276,46 @@ def all_recipes():
     recipes = mongo.db.recipes.find().sort([('last_modified', -1)])
     return render_template('all_recipes.html', recipes=recipes)
 
+@app.route('/custom_search')
+def custom_search():
+    return render_template('custom_search.html', cuisines=mongo.db.cuisines.find() ,countries=mongo.db.countries.find(), allergens=mongo.db.allergens.find())
+
+@app.route('/custom_search/search', methods=['POST', 'GET'])
+def custom_search_process():
+    user_input = request.form.to_dict()
+    ingredients = []
+    for key, val in user_input.items():
+        if 'ingredient' in key and len(val.strip()) > 0:
+            ingredients.append(val)
+
+    q = {}
+    q["$and"] = []
+
+    if len(request.form["name"].strip()) > 0:
+        q["$and"].append({"recipe_name": request.form['name'].strip().lower()})
+    if len(ingredients) > 0:
+        for i in ingredients:
+            q["$and"].append({"ingredients."+i: {"$exists": True}})
+    if len(request.form['author'].strip()) > 0:
+        q["$and"].append({"author": request.form['author'].strip().lower()})
+    if len(request.form.getlist('allergens')) > 0:
+        q["$and"].append({"allergens": {"$all": request.form.getlist('allergens')}})
+    try:
+        q["$and"].append({"cuisine": request.form['cuisine']})
+    except:
+        pass
+    try:
+        q["$and"].append({"origin": request.form['origin']})
+    except:
+        pass
+
+    if q != {}:    
+        pointers = mongo.db.recipes.find(q)
+        results = [p for p in pointers]
+        return render_template('custom_search_results.html', results=results)
+
+    return redirect(url_for('custom_search'))
+
 if __name__ == '__main__':
     # app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=True, threaded=True)
     app.run(debug=True, threaded=True)
