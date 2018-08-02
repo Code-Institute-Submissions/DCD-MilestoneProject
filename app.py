@@ -257,27 +257,21 @@ def most_upvote():
 
 @app.route('/guest_recipes')
 def guest_recipes():
-    random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)]).limit(15)
-    random = [r for r in random_pointer]
+    random_pointers = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)]).limit(15)
+    random = [r for r in random_pointers]
     return render_template('guest_recipes.html', random=random)
 
-@app.route('/recipes_by_cuisine/<cuisine>')
-def recipes_by_cuisine(cuisine):
-    pointer = mongo.db.recipes.find({"cuisine": cuisine})
-    recipes = [p for p in pointer]
-    if len(recipes) == 0:
-        return redirect('/')
+@app.route('/recipes_by_cuisine/<cuisine>/<page>')
+def recipes_by_cuisine(cuisine, page):
+    pointers = mongo.db.recipes.find({"cuisine": cuisine})
+    recipes = list(paginate([p for p in pointers], 10))
+    return render_template('recipes_by_cuisine.html', cuisine_count=count_category('cuisine'), cuisine=cuisine, recipes=recipes, page=page)
 
-    return render_template('recipes_by_cuisine.html', cuisine_count=count_category('cuisine'), cuisine=cuisine, recipes=recipes)
-
-@app.route('/recipes_by_origin/<origin>')
-def recipes_by_origin(origin):
-    pointer = mongo.db.recipes.find({"origin": origin})
-    recipes = [p for p in pointer]
-    if len(recipes) == 0:
-        return redirect('/')
-
-    return render_template('recipes_by_origin.html', origin_count=count_category('origin'), origin=origin, recipes=recipes)
+@app.route('/recipes_by_origin/<origin>/<page>')
+def recipes_by_origin(origin, page):
+    pointers = mongo.db.recipes.find({"origin": origin})
+    recipes = list(paginate([p for p in pointers], 10))
+    return render_template('recipes_by_origin.html', origin_count=count_category('origin'), origin=origin, recipes=recipes, page=page)
 
 @app.route('/all_recipes/<page>')
 def all_recipes(page):
