@@ -6,60 +6,54 @@ from wtforms import StringField, PasswordField, BooleanField, FieldList
 from wtforms.validators import InputRequired, Length
 from bson.objectid import ObjectId
 from datetime import datetime
+import itertools
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'THIS_IS_SECRET_KEY' 
+app.config['SECRET_KEY'] = 'THIS_IS_SECRET_KEY'
 app.config['MONGO_DBNAME'] = 'dcd-milestone'
 app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds243041.mlab.com:43041/dcd-milestone'
 
 mongo = PyMongo(app)
 
-def count_cuisines():
-    pointers = mongo.db.recipes.aggregate([{"$group": {'_id': '$cuisine', 'value':{'$sum':1}}}])
-    cuisine_count = [{"label": p['_id'], "value": p['value']} for p in pointers]
-
-    return cuisine_count
-
-def count_origins():
-    pointers = mongo.db.recipes.aggregate([{"$group": {'_id': '$origin', 'value':{'$sum':1}}}])
-    origin_count = [{"label": p['_id'], "value": p['value']} for p in pointers]
-
-    return origin_count
+def count_category(category):
+    pointers = mongo.db.recipes.aggregate([{"$group": {'_id': '$'+ category, 'value':{'$sum':1}}}])
+    counter = [{"label": p['_id'], "value": p['value']} for p in pointers]
+    return counter
 
 class UserForm(FlaskForm):
     username = StringField('username', validators=[InputRequired(), Length(max=20)])
     password = PasswordField('password', validators=[InputRequired(), Length(max=20)])
-    
-    
+
+
 @app.route('/')
 def index():
-    return render_template('index.html', cuisine_count=count_cuisines(), origin_count=count_origins())
-    
+    return render_template('index.html', cuisine_count=count_category('cuisine'), origin_count=count_category('origin'))
+
 @app.route('/login', methods=['GET',  'POST'])
 def login():
     if 'username' in session:
         return redirect('/')
 
     form = UserForm()
-    
+
     if form.validate_on_submit():
         users = mongo.db.users
         login_user = users.find_one({'username': form.username.data})
         if login_user and login_user['password'] == form.password.data:
             session['username'] = form.username.data
             return redirect('/')
-        
+
         flash("Invalid username/password combination", category='error')
-    
+
     return render_template('login.html', form=form)
-    
+
 @app.route('/register', methods=['GET',  'POST'])
 def register():
     if 'username' in session:
         return redirect('/')
 
     form = UserForm()
-    
+
     if form.validate_on_submit():
         if request.form['username'].strip().lower() == "guest":
             flash("This is a reserved name, please choose another name.")
@@ -67,32 +61,32 @@ def register():
 
         users = mongo.db.users
         existing_user = users.find_one({'username': form.username.data})
-        
+
         if existing_user is None:
             users.insert({'username': form.username.data, 'password': form.password.data})
             session['username'] = form.username.data
             return redirect('/')
-            
+
         flash("Username already exists!", category='error')
-        
+
     return render_template('register.html', form=form)
-    
+
 @app.route('/logout')
 def logout():
     session.pop('username', None)
     return redirect('/')
-    
+
 @app.route('/add_recipe')
 def add_recipe():
     return render_template('add_recipe.html', cuisines=mongo.db.cuisines.find() ,countries=mongo.db.countries.find(), allergens=mongo.db.allergens.find())
-    
+
 @app.route('/insert_recipe', methods=['POST'])
 def insert_recipe():
     recipes = mongo.db.recipes
-    
+
     # Reorganise all data before inserting into database
     user_input = request.form.to_dict()
-    
+
     # Separate ingredients into a separate dictionary
     ingredients = []
     unit = []
@@ -101,20 +95,20 @@ def insert_recipe():
             ingredients.append(val.lower())
         if 'unit' in key:
             unit.append(val.lower())
-            
+
     ingredients_unit = {}
     for x in range(0, len(ingredients)):
         ingredients_unit[ingredients[x]] = unit[x]
-    
+
     instructions = {}
     for key, val in user_input.items():
         if 'instruction' in key:
             instructions[key] = val
-    
+
     author = "guest"
     if 'username' in session:
         author = session['username']
-    
+
     # Reorganise all data into one dictionary before inserting into database
     data = {
         "recipe_name": request.form['name'].lower(),
@@ -130,10 +124,10 @@ def insert_recipe():
         "time_created": datetime.utcnow(),
         "last_modified": datetime.utcnow()
     }
-    
+
     recipes.insert_one(data)
 
-    # Since id is auto generated and there is no way to retrieve it at this point 
+    # Since id is auto generated and there is no way to retrieve it at this point
     # so using exact parameters user just given to find the newly created recipe and retrieve id from the record found,
     # Then use the id for redirect to view_recipe.
 
@@ -146,14 +140,14 @@ def insert_recipe():
         "instructions": instructions, # A dictionary
         "author": author
         })
-    
+
     return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
 
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
     mongo.db.recipes.update_one({"_id": ObjectId(recipe_id)}, {'$inc': {"views": 1}})
     return render_template('view_recipe.html', recipe=mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)}))
-    
+
 @app.route('/edit_recipe/<recipe_id>')
 def edit_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
@@ -174,11 +168,11 @@ def update_recipe(recipe_id):
             ingredients.append(val)
         if 'unit' in key:
             unit.append(val)
-            
+
     ingredients_unit = {}
     for x in range(0, len(ingredients)):
         ingredients_unit[ingredients[x]] = unit[x]
-    
+
     instructions = {}
     for key, val in user_input.items():
         if 'instruction' in key:
@@ -259,8 +253,8 @@ def recipes_by_cuisine(cuisine):
     recipes = [p for p in pointer]
     if len(recipes) == 0:
         return redirect('/')
-    
-    return render_template('recipes_by_cuisine.html', cuisine_count=count_cuisines(), cuisine=cuisine, recipes=recipes)
+
+    return render_template('recipes_by_cuisine.html', cuisine_count=count_category('cuisine'), cuisine=cuisine, recipes=recipes)
 
 @app.route('/recipes_by_origin/<origin>')
 def recipes_by_origin(origin):
@@ -268,8 +262,8 @@ def recipes_by_origin(origin):
     recipes = [p for p in pointer]
     if len(recipes) == 0:
         return redirect('/')
-    
-    return render_template('recipes_by_origin.html', origin_count=count_origins(), origin=origin, recipes=recipes)
+
+    return render_template('recipes_by_origin.html', origin_count=count_category('origin'), origin=origin, recipes=recipes)
 
 @app.route('/all_recipes')
 def all_recipes():
@@ -309,7 +303,7 @@ def custom_search_process():
     except:
         pass
 
-    if q != {}:    
+    if q != {}:
         pointers = mongo.db.recipes.find(q)
         results = [p for p in pointers]
         return render_template('custom_search_results.html', results=results)
