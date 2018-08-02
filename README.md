@@ -11,7 +11,8 @@
 ## Change Log
 
 ### 02/08/2018
-- Added pagination to custom search results and view all recipes.
+- Added pagination to custom search results, view all recipes, recipes by cuisine and recipes by origin.
+- Improved Pie charts' responsiveness.
 
 ### 01/08/2018
 - Added route for viewing all recipes without any filters (all_recipes.html).
