@@ -6,7 +6,7 @@
     </div>
     <div class="row">
         <div class="s12">
-            
+
         </div>
     </div>
 </div>
@@ -26,8 +26,8 @@
         },
         callbacks: {
             onClickSegment: function(a) {
-                loc = "{{ url_for('recipes_by_cuisine', cuisine="") }}" + a.data.label;
-                location.href = loc;
+                loc = "{{ url_for('recipes_by_cuisine', cuisine="", page="") }}";
+                location.href = loc.substring(0, loc.length - 2) + '/' + a.data.label + '/1';
             }
         }
     });
@@ -44,8 +44,8 @@
         },
         callbacks: {
             onClickSegment: function(a) {
-                loc = "{{ url_for('recipes_by_origin', origin="") }}" + a.data.label;
-                location.href = loc;
+                loc = "{{ url_for('recipes_by_origin', origin="", page="") }}";
+                location.href = loc.substring(0, loc.length - 2) + '/' + a.data.label + '/1';
             }
         }
     });
