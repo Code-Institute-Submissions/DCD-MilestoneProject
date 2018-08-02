@@ -10,12 +10,18 @@
 
 ## Change Log
 
+### 01/08/2018
+- Added route for viewing all recipes without any filters (all_recipes.html).
+- Added like(upvote) feature. This feature is limited to registered users.
+- Added another default grouping: Most likes(upvote).
+- Data visualization on certain groupings such as recipes by cuisine and recipes by country of origin will be shown on index.html. Individual pages of such grouping have also been added.
+- Custom search implemented, allowing users to search for particular recipes base on specific requirements.
+
 ### 29/07/2018
 - Added basic groupings of recipes such as showing the 5 most recently added recipe on index.html whilst giving a more detailed list (up to 20 items) in a separate page. As of now, there are 3 default groupings:
 	- New Arrivals (recently added recipes)
 	- Most Popular (recipes with most views)
 	- Capricious Recipes (recipes created by 'guests')
-More groupings will be added including more advanced ones where user can adjust criteria for example, users can filter recipes that has a particular country of origin.
 
 ### 27/07/2018
 - CRUD operation implemented on recipes.
