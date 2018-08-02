@@ -7,6 +7,7 @@ from wtforms.validators import InputRequired, Length
 from bson.objectid import ObjectId
 from datetime import datetime
 import itertools
+import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'THIS_IS_SECRET_KEY'
@@ -14,6 +15,16 @@ app.config['MONGO_DBNAME'] = 'dcd-milestone'
 app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds243041.mlab.com:43041/dcd-milestone'
 
 mongo = PyMongo(app)
+
+# Code from https://stackoverflow.com/questions/3744451/is-this-how-you-paginate-or-is-there-a-better-algorithm
+def paginate(iterable, page_size):
+    while True:
+        i1, i2 = itertools.tee(iterable)
+        iterable, page = (itertools.islice(i1, page_size, None),
+                list(itertools.islice(i2, page_size)))
+        if len(page) == 0:
+            break
+        yield page
 
 def count_category(category):
     pointers = mongo.db.recipes.aggregate([{"$group": {'_id': '$'+ category, 'value':{'$sum':1}}}])
@@ -204,18 +215,21 @@ def delete_recipe(recipe_id):
 @app.route('/upvote/<recipe_id>', methods=['GET', 'POST'])
 def upvote(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    if 'username' in session and session['username'] not in recipe['upvote']:
-        recipe['upvote'].append(session['username'])
-    elif 'username' in session and session['username'] in recipe['upvote']:
-        recipe['upvote'].remove(session['username'])
+    try:
+        if 'username' in session and session['username'] not in recipe['upvote']:
+            recipe['upvote'].append(session['username'])
+        elif 'username' in session and session['username'] in recipe['upvote']:
+            recipe['upvote'].remove(session['username'])
 
-    mongo.db.recipes.update_one({"_id": ObjectId(recipe_id)},
-            { '$set': {
-                "upvote": recipe['upvote'],
-                "upvote_count": len(recipe['upvote'])
-            }})
+        mongo.db.recipes.update_one({"_id": ObjectId(recipe_id)},
+                { '$set': {
+                    "upvote": recipe['upvote'],
+                    "upvote_count": len(recipe['upvote'])
+                }})
 
-    return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
+        return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
+    except:
+        return redirect('/')
 
 @app.route('/user/<user_name>')
 def user_page(user_name):
@@ -228,22 +242,22 @@ def user_page(user_name):
 
 @app.route('/new_arrivals')
 def new_arrivals():
-    new_arrivals = mongo.db.recipes.find().sort([('time_created', -1)])
+    new_arrivals = mongo.db.recipes.find().sort([('time_created', -1)]).limit(15)
     return render_template('new_arrivals.html', new_arrivals=new_arrivals)
 
 @app.route('/most_popular')
 def most_popular():
-    most_popular = mongo.db.recipes.find().sort([('views', -1)])
+    most_popular = mongo.db.recipes.find().sort([('views', -1)]).limit(15)
     return render_template('most_popular.html', most_popular=most_popular)
 
 @app.route('/most_upvote')
 def most_upvote():
-    most_upvote = mongo.db.recipes.find().sort([('upvote_count', -1)])
+    most_upvote = mongo.db.recipes.find().sort([('upvote_count', -1)]).limit(15)
     return render_template('most_upvote.html', most_upvote=most_upvote)
 
 @app.route('/guest_recipes')
 def guest_recipes():
-    random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)])
+    random_pointer = mongo.db.recipes.find({"author": 'guest' }).sort([('time_created', -1)]).limit(15)
     random = [r for r in random_pointer]
     return render_template('guest_recipes.html', random=random)
 
@@ -265,16 +279,16 @@ def recipes_by_origin(origin):
 
     return render_template('recipes_by_origin.html', origin_count=count_category('origin'), origin=origin, recipes=recipes)
 
-@app.route('/all_recipes')
-def all_recipes():
-    recipes = mongo.db.recipes.find().sort([('last_modified', -1)])
-    return render_template('all_recipes.html', recipes=recipes)
+@app.route('/all_recipes/<page>')
+def all_recipes(page):
+    recipes = list(paginate(mongo.db.recipes.find().sort([('last_modified', -1)]), 10))
+    return render_template('all_recipes.html', recipes=recipes, page=page)
 
-@app.route('/custom_search')
+@app.route('/custom_search', methods=['POST', 'GET'])
 def custom_search():
     return render_template('custom_search.html', cuisines=mongo.db.cuisines.find() ,countries=mongo.db.countries.find(), allergens=mongo.db.allergens.find())
 
-@app.route('/custom_search/search', methods=['POST', 'GET'])
+@app.route('/custom_search/search', methods=['POST'])
 def custom_search_process():
     user_input = request.form.to_dict()
     ingredients = []
@@ -285,8 +299,11 @@ def custom_search_process():
     q = {}
     q["$and"] = []
 
-    if len(request.form["name"].strip()) > 0:
-        q["$and"].append({"recipe_name": request.form['name'].strip().lower()})
+    try:
+        if len(request.form["name"].strip()) > 0:
+            q["$and"].append({"recipe_name": {"$regex": ".*" + request.form['name'].strip().lower() + ".*"}})
+    except:
+        pass
     if len(ingredients) > 0:
         for i in ingredients:
             q["$and"].append({"ingredients."+i: {"$exists": True}})
@@ -304,11 +321,18 @@ def custom_search_process():
         pass
 
     if q != {}:
-        pointers = mongo.db.recipes.find(q)
-        results = [p for p in pointers]
-        return render_template('custom_search_results.html', results=results)
+        pointers = mongo.db.recipes.find(q).sort([('last_modified', -1)])
+        session['q'] = q
+        return redirect(url_for('custom_search_results', page=1))
 
     return redirect(url_for('custom_search'))
+
+@app.route('/custom_search/results/<page>', methods=['GET'])
+def custom_search_results(page):
+    q = session['q']
+    pointers = mongo.db.recipes.find(q).sort([('last_modified', -1)])
+    results = list(paginate([p for p in pointers], 10))
+    return render_template('custom_search_results.html', results=results, page=page)
 
 if __name__ == '__main__':
     # app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=True, threaded=True)

@@ -6,11 +6,36 @@
             <h2>Search Results</h2>
             <h6>Can't find what you need? Try changing your requirements.</h6>
             <a href="{{ url_for('custom_search') }}" class="btn waves-effect waves-light"><i class="material-icons right">search</i>Search Again</a>
+
+						<ul class="pagination">
+							{% if page|int == 1 %}
+								<li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+							{% else %}
+								<li><a href="{{ url_for('custom_search_results', page=page|int - 1) }}"><i class="material-icons">chevron_left</i></a></li>
+							{% endif %}
+
+							{% for r in results %}
+								{% if loop.index == page|int %}
+									<li class="active"><a href="#">{{ loop.index }}</a></li>
+								{% else %}
+									<li class="waves-effect"><a href="{{ url_for('custom_search_results', page=loop.index) }}">{{ loop.index }}</a></li>
+								{% endif %}
+							{% endfor %}
+
+							{% if page|int == results|length %}
+								<li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
+							{% else %}
+								<li><a href="{{ url_for('custom_search_results', page=page|int + 1) }}"><i class="material-icons">chevron_right</i></a></li>
+							{% endif %}
+						</ul>
+
             <div class="collection">
-            {% for r in results %}
-                <a href="{{ url_for('view_recipe', recipe_id=r._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ r.recipe_name.title() }}</span> by <span class="flow-text teal-text text-darken-3">{{ r.author }}</span></a>
+            {% for r in results[page|int - 1] %}
+                <a href="{{ url_for('view_recipe', recipe_id=r._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ r.recipe_name.title() }}</span> by <span class="flow-text teal-text text-darken-3">{{ r.author }}</span> <span class="black-text">Last Modified: {{ r.last_modified.strftime('%Y-%m-%d %H:%M:%S') }} UTC</span></a>
             {% endfor %}
             </div>
+
+
         </div>
     </div>
 </div>

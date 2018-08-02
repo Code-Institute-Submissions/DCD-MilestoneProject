@@ -5,11 +5,55 @@
         <div class="col s12 m10 offset-m1">
             <h2>All Recipes</h2>
             <h6>Everything we've got to offer right now, take your time and have a look!</h6>
+						<ul class="pagination">
+							{% if page|int == 1 %}
+								<li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+							{% else %}
+								<li><a href="{{ url_for('all_recipes', page=page|int - 1) }}"><i class="material-icons">chevron_left</i></a></li>
+							{% endif %}
+
+							{% for r in recipes %}
+								{% if loop.index == page|int %}
+									<li class="active"><a href="#">{{ loop.index }}</a></li>
+								{% else %}
+									<li class="waves-effect"><a href="{{ url_for('all_recipes', page=loop.index) }}">{{ loop.index }}</a></li>
+								{% endif %}
+							{% endfor %}
+
+							{% if page|int == recipes|length %}
+								<li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
+							{% else %}
+								<li><a href="{{ url_for('all_recipes', page=page|int + 1) }}"><i class="material-icons">chevron_right</i></a></li>
+							{% endif %}
+						</ul>
+
             <div class="collection">
-            {% for r in recipes %}
+            {% for r in recipes[page|int - 1] %}
                 <a href="{{ url_for('view_recipe', recipe_id=r._id) }}" class="collection-item"><span class="flow-text teal-text text-darken-3">{{ r.recipe_name.title() }}</span> by <span class="flow-text teal-text text-darken-3">{{ r.author }}</span> <span class="black-text">Last Modified: {{ r.last_modified.strftime('%Y-%m-%d %H:%M:%S') }} UTC</span></a>
             {% endfor %}
             </div>
+
+						<ul class="pagination">
+							{% if page|int == 1 %}
+								<li class="disabled"><a href="#"><i class="material-icons">chevron_left</i></a></li>
+							{% else %}
+								<li><a href="{{ url_for('all_recipes', page=page|int - 1) }}"><i class="material-icons">chevron_left</i></a></li>
+							{% endif %}
+
+							{% for r in recipes %}
+								{% if loop.index == page|int %}
+									<li class="active"><a href="#">{{ loop.index }}</a></li>
+								{% else %}
+									<li class="waves-effect"><a href="{{ url_for('all_recipes', page=loop.index) }}">{{ loop.index }}</a></li>
+								{% endif %}
+							{% endfor %}
+
+							{% if page|int == recipes|length %}
+								<li class="disabled"><a href="#"><i class="material-icons">chevron_right</i></a></li>
+							{% else %}
+								<li><a href="{{ url_for('all_recipes', page=page|int + 1) }}"><i class="material-icons">chevron_right</i></a></li>
+							{% endif %}
+						</ul>
         </div>
     </div>
 </div>
