@@ -10,6 +10,9 @@
 
 ## Change Log
 
+### 02/08/2018
+- Added pagination to custom search results and view all recipes.
+
 ### 01/08/2018
 - Added route for viewing all recipes without any filters (all_recipes.html).
 - Added like(upvote) feature. This feature is limited to registered users.
