@@ -25,9 +25,8 @@
                             <h4>Country of origin</h4> {{ r.origin }}
                         </div>
                         <div class="col s12 m4">
-                            <h4>Cuisine</h4> {% for c in r.cuisine %}
-                            <div class="chip">{{ c.title() }}</div>
-                            {% endfor %}
+                            <h4>Cuisine</h4>
+                            <div class="chip">{{ r.cuisine }}</div>
                         </div>
                     </div>
                     <div class="row">
