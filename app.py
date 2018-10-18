@@ -329,5 +329,9 @@ def custom_search_results(page):
     return render_template('custom_search_results.html', results=results, page=page)
 
 if __name__ == '__main__':
-    app.run(host=os.environ.get('IP'), port=int(os.environ.get('PORT')), debug=False, threaded=True)
-    # app.run(debug=True, threaded=True)
+    if os.environ.get('IP') and os.environ.get('PORT'):
+        app.run(host=os.environ.get('IP'),
+                port=int(os.environ.get('PORT')),
+                debug=False, threaded=True)
+    else:
+        app.run(debug=True, threaded=True)
