@@ -4,18 +4,17 @@
     <h2>User Registeration</h2>
     <div class="row">
         <form class="col s12" method="POST" action="/register">
-            {{ form.hidden_tag() }}
             <div class="input-field col s12">
                 <i class="material-icons prefix">account_circle</i>
-                {{ form.username }}
+                <input type="text" name="username" required maxlength="20">
                 <label for="username">username</label>
             </div>
             <div class="input-field col s12">
                 <i class="material-icons prefix">verified_user</i>
-                {{ form.password }}
+                <input type="password" name="password" required maxlength="20">
                 <label for="username">password</label>
             </div>
-            
+
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     {% for message in messages %}
@@ -28,7 +27,7 @@
                 <button class="waves-effect waves-light btn btn-large" type="submit"><i class="material-icons right">add_circle</i>Register</button>
             </div>
         </form>
-        
+
         <div class="col s12">
             <a href="{{ url_for('index') }}">Return to Home Page</a>
         </div>

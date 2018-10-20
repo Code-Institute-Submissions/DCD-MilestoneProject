@@ -1,8 +1,6 @@
 import os
 from flask import Flask, redirect, render_template, request, url_for, session, flash
 from flask_pymongo import PyMongo
-from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, FieldList
 from wtforms.validators import InputRequired, Length
 from bson.objectid import ObjectId
 from datetime import datetime
@@ -31,11 +29,6 @@ def count_category(category):
     counter = [{"label": p['_id'], "value": p['value']} for p in pointers]
     return counter
 
-class UserForm(FlaskForm):
-    username = StringField('username', validators=[InputRequired(), Length(max=20)])
-    password = PasswordField('password', validators=[InputRequired(), Length(max=20)])
-
-
 @app.route('/')
 def index():
     return render_template('index.html', cuisine_count=count_category('cuisine'), origin_count=count_category('origin'))
@@ -45,42 +38,38 @@ def login():
     if 'username' in session:
         return redirect('/')
 
-    form = UserForm()
-
-    if form.validate_on_submit():
+    if request.method == "POST":
         users = mongo.db.users
-        login_user = users.find_one({'username': form.username.data})
-        if login_user and login_user['password'] == form.password.data:
-            session['username'] = form.username.data
+        login_user = users.find_one({'username': request.form['username']})
+        if login_user and login_user['password'] == request.form['password']:
+            session['username'] = request.form['username']
             return redirect('/')
 
         flash("Invalid username/password combination", category='error')
 
-    return render_template('login.html', form=form)
+    return render_template('login.html')
 
 @app.route('/register', methods=['GET',  'POST'])
 def register():
     if 'username' in session:
         return redirect('/')
 
-    form = UserForm()
-
-    if form.validate_on_submit():
+    if request.method == "POST":
         if request.form['username'].strip().lower() == "guest":
             flash("This is a reserved name, please choose another name.")
-            return render_template('register.html', form=form)
+            return render_template('register.html')
 
         users = mongo.db.users
-        existing_user = users.find_one({'username': form.username.data})
+        existing_user = users.find_one({'username': request.form['username']})
 
         if existing_user is None:
-            users.insert({'username': form.username.data, 'password': form.password.data})
-            session['username'] = form.username.data
+            users.insert({'username': request.form['username'], 'password': request.form['password']})
+            session['username'] = request.form['username']
             return redirect('/')
 
         flash("Username already exists!", category='error')
 
-    return render_template('register.html', form=form)
+    return render_template('register.html')
 
 @app.route('/logout')
 def logout():
@@ -327,7 +316,7 @@ def custom_search_results(page):
     results = list(paginate([p for p in pointers], 10))
     return render_template('custom_search_results.html', results=results, page=page)
 
-if __name__ == '__main__':
+if __name__ == '__main__': # pragma: no cover
     if os.environ.get('IP') and os.environ.get('PORT'):
         app.run(host=os.environ.get('IP'),
                 port=int(os.environ.get('PORT')),
