@@ -63,7 +63,7 @@ def register():
         existing_user = users.find_one({'username': request.form['username']})
 
         if existing_user is None:
-            users.insert({'username': request.form['username'], 'password': request.form['password']})
+            users.insert_one({'username': request.form['username'], 'password': request.form['password']})
             session['username'] = request.form['username']
             return redirect('/')
 
