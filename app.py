@@ -202,7 +202,6 @@ def update_recipe(recipe_id):
 
     return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
 
-
 @app.route('/delete_recipe/<recipe_id>')
 def delete_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
