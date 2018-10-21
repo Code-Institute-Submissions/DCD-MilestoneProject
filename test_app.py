@@ -280,7 +280,7 @@ class TestRecipesCRUD(unittest.TestCase):
             self.assertEqual(response.status_code, 200) # Edit recipe page can be reached without problem
             self.assertIn(b'<h3>Edit Recipe</h3>', response.data) # Correct template used
             mongo.db.recipes.delete_one(recipe)
-        else:
+        else: # pragma: no cover
             self.fail("Were not able to retrieve the recipe created.")
 
     # To test if update operation actually works
@@ -314,7 +314,7 @@ class TestRecipesCRUD(unittest.TestCase):
             self.assertIn(b'instruction 2', response.data)
             self.assertNotIn(b'ingredient 2', response.data)
             mongo.db.recipes.delete_one({'recipe_name': 'test recipe new'})
-        else:
+        else: # pragma: no cover
             self.fail("Were not able to retrieve the recipe created.")
 
     # To test if app behaves as expected when user attempt to update recipe other than their own
@@ -350,7 +350,7 @@ class TestRecipesCRUD(unittest.TestCase):
             response = self.app.post('/update_recipe/' + str(recipe['_id']), data=newdata, follow_redirects=True)
             self.assertIn(b"You are not the author of that recipe, hence you are not allowed to edit.", response.data)
             mongo.db.recipes.delete_one(recipe)
-        else:
+        else: # pragma: no cover
             self.fail("Were not able to retrieve the recipe created.")
 
     def test_delete_recipe(self):
@@ -373,7 +373,7 @@ class TestRecipesCRUD(unittest.TestCase):
             response = self.app.get('/delete_recipe/' + str(recipe['_id']), follow_redirects=True)
             ycount = mongo.db.recipes.count_documents({})
             self.assertNotEqual(xcount, ycount)
-        else:
+        else: # pragma: no cover
             self.fail("Were not able to retrieve the recipe created.")
 
     def test_invalid_delete_recipe(self):
@@ -397,8 +397,165 @@ class TestRecipesCRUD(unittest.TestCase):
             response = self.app.get('/delete_recipe/' + str(recipe['_id']), follow_redirects=True)
             self.assertIn(b'You are not the author of that recipe, hence you are not allowed to delete.', response.data)
             mongo.db.recipes.delete_one(recipe)
-        else:
+        else: # pragma: no cover
             self.fail("Were not able to retrieve the recipe created.")
+
+"""
+To test if upvote feature behaves as expected
+"""
+class TestUpvote(unittest.TestCase):
+    def setUp(self):
+        self.app = app.test_client()
+        app.config['SERVER_NAME'] = 'localhost.localdomain'
+        app.config['SECRET_KEY'] = 'secret_key'
+
+    def test_upvote(self):
+        with self.app.session_transaction() as sess:
+            sess['username'] = 'admin' # Assumed user 'admin' logged in
+        testdata = {
+            "name": "test recipe",
+            "origin": "Japan",
+            "cuisine": "Japanese",
+            "ingredient_1": "ingredient 1",
+            "unit_1": "unit 1",
+            "ingredient_2": "ingredient 2",
+            "unit_2": "unit 2",
+            "instruction_1": "instruction 1"
+        }
+        self.app.post('/insert_recipe',data=testdata ,follow_redirects=True)
+        recipe = mongo.db.recipes.find_one({'recipe_name': 'test recipe'})
+        if recipe:
+            response = self.app.get('/upvote/' + str(recipe['_id']))
+            recipe = mongo.db.recipes.find_one({'recipe_name': 'test recipe'})
+            self.assertEqual(recipe['upvote_count'], 1)
+            mongo.db.recipes.delete_one(recipe)
+        else: # pragma: no cover
+            self.fail("Were not able to retrieve the recipe created.")
+
+    def test_undo_upvote(self):
+        with self.app.session_transaction() as sess:
+            sess['username'] = 'admin' # Assumed user 'admin' logged in
+        testdata = {
+            "name": "test recipe",
+            "origin": "Japan",
+            "cuisine": "Japanese",
+            "ingredient_1": "ingredient 1",
+            "unit_1": "unit 1",
+            "ingredient_2": "ingredient 2",
+            "unit_2": "unit 2",
+            "instruction_1": "instruction 1"
+        }
+        self.app.post('/insert_recipe',data=testdata ,follow_redirects=True)
+        recipe = mongo.db.recipes.find_one({'recipe_name': 'test recipe'})
+        if recipe:
+            self.app.get('/upvote/' + str(recipe['_id']))
+            response = self.app.get('/upvote/' + str(recipe['_id']))
+            recipe = mongo.db.recipes.find_one({'recipe_name': 'test recipe'})
+            self.assertEqual(recipe['upvote_count'], 0)
+            mongo.db.recipes.delete_one(recipe)
+        else: # pragma: no cover
+            self.fail("Were not able to retrieve the recipe created.")
+
+    def test_invalid_upvote(self):
+        with self.app.session_transaction() as sess:
+            sess['username'] = 'admin' # Assumed user 'admin' logged in
+        testdata = {
+            "name": "test recipe",
+            "origin": "Japan",
+            "cuisine": "Japanese",
+            "ingredient_1": "ingredient 1",
+            "unit_1": "unit 1",
+            "ingredient_2": "ingredient 2",
+            "unit_2": "unit 2",
+            "instruction_1": "instruction 1"
+        }
+        self.app.post('/insert_recipe',data=testdata ,follow_redirects=True)
+        with self.app.session_transaction() as sess:
+            sess.pop('username', None) # Assumed user 'admin' logged out
+        recipe = mongo.db.recipes.find_one({'recipe_name': 'test recipe'})
+        if recipe:
+            response = self.app.get('/upvote/' + str(recipe['_id']), follow_redirects=True)
+            self.assertIn(b'<h2>User Login</h2>', response.data) # Redirected to login page
+            mongo.db.recipes.delete_one(recipe)
+        else: # pragma: no cover
+            self.fail("Were not able to retrieve the recipe created.")
+
+"""
+To test if upvote feature behaves as expected
+"""
+class TestCustomSearch(unittest.TestCase):
+    def setUp(self):
+        self.app = app.test_client()
+        app.config['SERVER_NAME'] = 'localhost.localdomain'
+        app.config['SECRET_KEY'] = 'secret_key'
+        with self.app.session_transaction() as sess:
+            sess['username'] = 'admin' # Assumed user 'admin' logged in
+        testdata = {
+            "name": "test recipe",
+            "origin": "Japan",
+            "cuisine": "Japanese",
+            "ingredient_1": "ingredient 1",
+            "unit_1": "unit 1",
+            "ingredient_2": "ingredient 2",
+            "unit_2": "unit 2",
+            "instruction_1": "instruction 1"
+        }
+        self.app.post('/insert_recipe',data=testdata ,follow_redirects=True)
+
+    def tearDown(self):
+        recipe = mongo.db.recipes.find_one({'recipe_name': 'test recipe'})
+        if recipe:
+            mongo.db.recipes.delete_one(recipe)
+
+    """
+    Need to test several patterns of search criteria to make sure all process
+    in composing the search query are tested.
+    """
+    def test_custom_search_case1(self):
+        searchcriteria = { # These 3 criteria need to be passed manually whilst the rest are processed
+            "name": "test",
+            "ingredient_1": "", # did not specify any ingredient as search criteria
+            "author": "", # did not specify any author as search criteria
+        }
+        response = self.app.post('/custom_search/search', data=searchcriteria, follow_redirects=True)
+        self.assertIn(b'Test Recipe', response.data)
+
+    def test_custom_search_case2(self):
+        searchcriteria = { # These 3 criteria need to be passed manually whilst the rest are processed
+            "name": "", # did not specify any recipe name
+            "ingredient_1": "ingredient 1",
+            "author": "", # did not specify any author as search criteria
+        }
+        response = self.app.post('/custom_search/search', data=searchcriteria, follow_redirects=True)
+        self.assertIn(b'Test Recipe', response.data)
+
+    def test_custom_search_case3(self):
+        searchcriteria = { # These 3 criteria need to be passed manually whilst the rest are processed
+            "name": "", # Nothing is specified
+            "ingredient_1": "",
+            "author": "",
+        }
+        response = self.app.post('/custom_search/search', data=searchcriteria, follow_redirects=True)
+        self.assertIn(b'<h3>Custom Search</h3>', response.data) # Search is not processed
+
+    def test_custom_search_case4(self):
+        searchcriteria = { # These 3 criteria need to be passed manually whilst the rest are processed
+            "name": "",
+            "ingredient_1": "",
+            "author": "admin",
+        }
+        response = self.app.post('/custom_search/search', data=searchcriteria, follow_redirects=True)
+        self.assertIn(b'Test Recipe', response.data)
+
+    def test_custom_search_case5(self):
+        searchcriteria = { # These 3 criteria need to be passed manually whilst the rest are processed
+            "name": "",
+            "ingredient_1": "",
+            "author": "",
+            "allergens": "Gluten"
+        }
+        response = self.app.post('/custom_search/search', data=searchcriteria, follow_redirects=True)
+        self.assertNotIn(b'Test Recipe', response.data)
 
 if __name__ == '__main__':
     unittest.main()
