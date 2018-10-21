@@ -1,9 +1,9 @@
 {% extends 'base.html' %} {% block content %}
-<div class="col s12 m8 l10 offset-m4 offset-l2">
+<div class="col s12 l10 offset-l2">
     <h3>
         {{ recipe.recipe_name.title() }} <span class="subtext">by</span> {{ recipe.author }}
         <span class="subtext">
-            Views: {{ recipe.views }}    
+            Views: {{ recipe.views }}
             Likes: {{ recipe.upvote_count }}
         </span>
         {% if 'username' in session %}

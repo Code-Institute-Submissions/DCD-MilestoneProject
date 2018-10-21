@@ -1,5 +1,5 @@
 {% extends 'base.html' %} {% block content %}
-<div class="col s12 m8 l10 offset-m4 offset-l2">
+<div class="col s12 l10 offset-l2">
     <h1 class="teal-text text-darken-3 center-align">Hi, {{ session['username'] }}</h1>
     {% if recipes|length != 0 %}
         <p>Here is a list of the recipes you created.</p>
