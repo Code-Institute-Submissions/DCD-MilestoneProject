@@ -16,7 +16,7 @@ This project provides users with a intuitive platform to store and share cooking
 - View recipes in detail
 - View recipes list with predefined filter
 - Add new recipes to website
-- User registeration
+- User registration
 - User login
 - Custom search
 - Data visualisation of recipes
@@ -40,3 +40,22 @@ This project provides users with a intuitive platform to store and share cooking
 	- Used to aid users in selecting options from dropdown lists as some of them have a vast amount of options such as country of origin.
 - [Flask](http://flask.pocoo.org/)
 	- Framework used for this project. It is used to handle routing and logic behind the project.
+
+## Testing
+Testing for this project has been automated using unittest package from Python. In addition to that coverage.py has been used to ensure a high coverage of code tested. The coverage report has been hosted on [GitHub Pages](https://comacoma.github.io/DCD-MilestoneProject/). Tests are mainly broken in 3 categories:
+- Route: to test whether all routes can be reached without raising any problems.
+- CRUD operations: to test if the application can carry out CRUD operations as expected.
+- Miscellaneous: to test if supplementary features such as custom search and upvote behaves as expected.
+One thing to note is that a separate Mongo database, which is a duplicate of the database used for deployment model has been used solely for testing.
+
+During testing, the following points were discovered; some of them have not been addressed in the final build yet.
+- Some pages have paginations available to reduce scrolling needed however when users attempt to enter invalid page number for example, 5 when there are only 2 pages available, the application shows some unintended behaviour such as showing one of the available pages or nothing at all. Though this does not cause the application to crash it might confuse users.
+- Some features, mainly CRUD operations, rely on a valid recipe id and a username from session (i.e. a logged in user). Verification for said values was not available in earlier builds, causing the application to crash in certain scenarios and it was not notified until testing stage. Regardless, they have been addressed in the final build.
+
+### Responsive design
+Another thing to take note of is the responsive design of this project. Using a mobile-first approach, the web app has different layout depending on screen size. To be specific:
+- A 1 column layout is used on small screens whilst a 2 column design with roughly 1:2 ratio is used on large screens.
+- As provided by [Materialize CSS](https://materializecss.com/), navigation bar automatically collapses into slide-out menu on the side when screen size drops below a certain breakpoint.
+
+## Deployment
+This project has been deployed on [Heroku](https://dcd-milestone-colman.herokuapp.com/). As mentioned in Testing section there are in total two Mongo databases prepared for this project, one for deployment and the other for testing. Depending on whether environment variables are provided the application will choose which database to use, as well as whether or not to use debug mode. Basically, if no environment variables are provided (i.e. running the application locally), test database will be used and application will run in debug mode. On the other hand if variables are provided (i.e. on Heroku) the deployment database will be used and application will run with debug mode turned off. Because of this decision, there was no need to write separate settings for testing and deployment.
