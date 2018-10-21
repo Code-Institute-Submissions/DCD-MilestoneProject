@@ -15,7 +15,7 @@
                     <select id="cuisine" name="cuisine" data-live-search="true" required>
                         <option disabled selected>Choose Cuisine (Type in country name to speed up search)</option>
                         {% for c in cuisines %}
-                            {% if c.country == recipe.origin %}
+                            {% if c.cuisine == recipe.cuisine %}
                                 <option value="{{ c.cuisine }}" selected>{{ c.cuisine }}</option>
                             {% else %}
                                 <option value="{{ c.cuisine }}">{{ c.cuisine }}</option>
