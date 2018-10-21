@@ -231,7 +231,7 @@ def delete_recipe(recipe_id):
         flash("Invalid recipe id", category='error')
         return redirect('/')
 
-@app.route('/upvote/<recipe_id>', methods=['GET', 'POST'])
+@app.route('/upvote/<recipe_id>')
 def upvote(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
     if recipe:
@@ -317,6 +317,13 @@ def custom_search():
 @app.route('/custom_search/search', methods=['POST'])
 def custom_search_process():
     user_input = request.form.to_dict()
+    empty_flag = { # As in if no input is given
+        "name": "",
+        "ingredient_1": "",
+        "author": "",
+    }
+    if user_input == empty_flag:
+        return redirect(url_for('custom_search'))
     ingredients = []
     for key, val in user_input.items():
         if 'ingredient' in key and len(val.strip()) > 0:
@@ -328,7 +335,7 @@ def custom_search_process():
     try:
         if len(request.form["name"].strip()) > 0:
             q["$and"].append({"recipe_name": {"$regex": ".*" + request.form['name'].strip().lower() + ".*"}})
-    except:
+    except: # pragma: no cover
         pass
     if len(ingredients) > 0:
         for i in ingredients:
@@ -350,8 +357,6 @@ def custom_search_process():
         pointers = mongo.db.recipes.find(q).sort([('last_modified', -1)])
         session['q'] = q
         return redirect(url_for('custom_search_results', page=1))
-
-    return redirect(url_for('custom_search'))
 
 @app.route('/custom_search/results/<page>', methods=['GET'])
 def custom_search_results(page):
