@@ -156,7 +156,7 @@ class TestUserAuthentication(unittest.TestCase):
         mongo = PyMongo(app)
         testdata = mongo.db.users.find_one({'username': 'testuser'})
         if testdata:
-            mongo.db.users.delete_one({'username': 'testuser'})
+            mongo.db.users.delete_one(testdata)
 
     def test_register_with_reserved_name(self):
         response = self.app.post('/register', data=dict(username='guest', password='password'), follow_redirects=True)
@@ -175,6 +175,45 @@ class TestRecipesCRUD(unittest.TestCase):
         app.config['SERVER_NAME'] = 'localhost.localdomain'
         app.config['SECRET_KEY'] = 'secret_key'
         return app
+
+    def test_add_recipe_as_guest(self):
+        testdata = {
+            "name": "test recipe",
+            "origin": "Japan",
+            "cuisine": "Japanese",
+            "ingredient_1": "ingredient 1",
+            "unit_1": "unit 1",
+            "ingredient_2": "ingredient 2",
+            "unit_2": "unit 2",
+            "instruction_1": "instruction 1"
+        }
+        response = self.app.post('/insert_recipe',data=testdata ,follow_redirects=True)
+        self.assertTrue(response.status_code, 302) # Redirected to view_recipe page
+        self.assertIn(b'Test Recipe <span class="subtext">by</span> guest', response.data) # Not logged in, so author is set to 'guest'
+        # Removing test data after assertion
+        data = mongo.db.recipes.find_one({'recipe_name': 'test recipe'})
+        if data:
+            mongo.db.recipes.delete_one(data)
+
+    def test_add_recipe_as_named_user(self):
+        with self.app.session_transaction() as sess:
+            sess['username'] = 'admin' # Assumed user 'admin' logged in
+        testdata = {
+            "name": "test recipe",
+            "origin": "Japan",
+            "cuisine": "Japanese",
+            "ingredient_1": "ingredient 1",
+            "unit_1": "unit 1",
+            "ingredient_2": "ingredient 2",
+            "unit_2": "unit 2",
+            "instruction_1": "instruction 1"
+        }
+        response = self.app.post('/insert_recipe',data=testdata ,follow_redirects=True)
+        self.assertTrue(response.status_code, 302) # Redirected to view_recipe page
+        self.assertIn(b'Test Recipe <span class="subtext">by</span> admin', response.data) # Author is set to user logged in (i.e. admin)
+        data = mongo.db.recipes.find_one({'recipe_name': 'test recipe'})
+        if data:
+            mongo.db.recipes.delete_one(data)
 
 if __name__ == '__main__':
     unittest.main()
