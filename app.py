@@ -8,10 +8,10 @@ import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'THIS_IS_SECRET_KEY'
-if os.environ.get('IP') and os.environ.get('PORT'):
+if os.environ.get('IP') and os.environ.get('PORT'): # pragma: no cover
     app.config['MONGO_DBNAME'] = 'dcd-milestone'
     app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds243041.mlab.com:43041/dcd-milestone'
-else:
+else: # pragma: no cover
     app.config['MONGO_DBNAME'] = 'dcd-milestone-test'
     app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds137643.mlab.com:37643/dcd-milestone-test'
 
@@ -100,17 +100,16 @@ def insert_recipe():
             unit.append(val.lower())
 
     ingredients_unit = {}
-    for x in range(0, len(ingredients)):
-        ingredients_unit[ingredients[x]] = unit[x]
+    if len(ingredients) > 0 and len(unit) > 0:
+        for x in range(0, len(ingredients)):
+            ingredients_unit[ingredients[x]] = unit[x]
 
     instructions = {}
     for key, val in user_input.items():
         if 'instruction' in key:
             instructions[key] = val
 
-    author = "guest"
-    if 'username' in session:
-        author = session['username']
+    author = session['username'] if 'username' in session else 'guest'
 
     # Reorganise all data into one dictionary before inserting into database
     data = {
@@ -132,7 +131,7 @@ def insert_recipe():
 
     # Since id is auto generated and there is no way to retrieve it at this point
     # so using exact parameters user just given to find the newly created recipe and retrieve id from the record found,
-    # Then use the id for redirect to view_recipe.
+    # then use the id for redirect to view_recipe.
 
     recipe = mongo.db.recipes.find_one({
         "recipe_name": request.form['name'],
