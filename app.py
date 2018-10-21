@@ -1,7 +1,6 @@
 import os
 from flask import Flask, redirect, render_template, request, url_for, session, flash
 from flask_pymongo import PyMongo
-from wtforms.validators import InputRequired, Length
 from bson.objectid import ObjectId
 from datetime import datetime
 import itertools
@@ -9,8 +8,12 @@ import json
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'THIS_IS_SECRET_KEY'
-app.config['MONGO_DBNAME'] = 'dcd-milestone'
-app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds243041.mlab.com:43041/dcd-milestone'
+if os.environ.get('IP') and os.environ.get('PORT'):
+    app.config['MONGO_DBNAME'] = 'dcd-milestone'
+    app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds243041.mlab.com:43041/dcd-milestone'
+else:
+    app.config['MONGO_DBNAME'] = 'dcd-milestone-test'
+    app.config['MONGO_URI'] = 'mongodb://admin:admin123@ds137643.mlab.com:37643/dcd-milestone-test'
 
 mongo = PyMongo(app)
 
