@@ -18,7 +18,7 @@
         {% if 'username' in session and session['username'] == recipe.author %}
             <span class="right">
                 <a href="{{ url_for('edit_recipe', recipe_id=recipe._id) }}" class="btn waves-effect waves-light">Edit Recipe</a>
-                <a data-target="view_recipe_modal" class="btn waves-effect waves-light red">Delete Recipe</a>
+                <a data-target="view_recipe_modal" class="btn waves-effect waves-light red modal-trigger">Delete Recipe</a>
             </span>
         {% endif %}
     </h3>
