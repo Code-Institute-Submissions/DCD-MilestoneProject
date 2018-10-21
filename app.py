@@ -147,88 +147,130 @@ def insert_recipe():
 
 @app.route('/view_recipe/<recipe_id>')
 def view_recipe(recipe_id):
-    mongo.db.recipes.update_one({"_id": ObjectId(recipe_id)}, {'$inc': {"views": 1}})
-    return render_template('view_recipe.html', recipe=mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)}))
+    recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
+    if recipe:
+        mongo.db.recipes.update_one({"_id": ObjectId(recipe_id)}, {'$inc': {"views": 1}})
+        return render_template('view_recipe.html', recipe=mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)}))
+    else:
+        flash("Invalid recipe id", category='error')
+        return redirect('/')
 
 @app.route('/edit_recipe/<recipe_id>')
 def edit_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    # Only allows users to update recipes they created.
-    if 'username' in session and session['username'] == recipe['author']:
-        return render_template('edit_recipe.html', recipe=recipe, cuisines=mongo.db.cuisines.find(), countries=mongo.db.countries.find(), allergens=mongo.db.allergens.find())
-
-    return redirect('/')
+    if recipe:
+        # Only allows users to update recipes they created.
+        if 'username' in session and session['username'] == recipe['author']:
+            return render_template(
+                'edit_recipe.html',
+                recipe=recipe,
+                cuisines=mongo.db.cuisines.find(),
+                countries=mongo.db.countries.find(),
+                allergens=mongo.db.allergens.find()
+            )
+        else:
+            flash("You are not the author of that recipe, hence you are not allowed to edit.", category='error')
+            return redirect('/')
+    else:
+        flash("Invalid recipe id", category='error')
+        return redirect('/')
 
 @app.route('/update_recipe/<recipe_id>', methods=['POST'])
 def update_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    user_input = request.form.to_dict()
-    ingredients = []
-    unit = []
-    for key, val in user_input.items():
-        if 'ingredient' in key:
-            ingredients.append(val)
-        if 'unit' in key:
-            unit.append(val)
+    if recipe:
+        if 'username' in session and session['username'] == recipe['author']:
+            user_input = request.form.to_dict()
+            ingredients = []
+            unit = []
+            for key, val in user_input.items():
+                if 'ingredient' in key:
+                    ingredients.append(val)
+                if 'unit' in key:
+                    unit.append(val)
 
-    ingredients_unit = {}
-    for x in range(0, len(ingredients)):
-        ingredients_unit[ingredients[x]] = unit[x]
+            ingredients_unit = {}
+            for x in range(0, len(ingredients)):
+                ingredients_unit[ingredients[x]] = unit[x]
 
-    instructions = {}
-    for key, val in user_input.items():
-        if 'instruction' in key:
-            instructions[key] = val
+            instructions = {}
+            for key, val in user_input.items():
+                if 'instruction' in key:
+                    instructions[key] = val
 
-    mongo.db.recipes.update_one({'_id': ObjectId(recipe_id)},
-        { '$set': {
-                    "recipe_name": request.form['name'],
-                    "origin": request.form['origin'],
-                    "cuisine": request.form['cuisine'],
-                    "ingredients": ingredients_unit, # A dictionary
-                    "allergens": request.form.getlist('allergens'),
-                    "instructions": instructions,
-                    "last_modified": datetime.utcnow()
-                }})
+            mongo.db.recipes.update_one({'_id': ObjectId(recipe_id)},
+                { '$set': {
+                            "recipe_name": request.form['name'],
+                            "origin": request.form['origin'],
+                            "cuisine": request.form['cuisine'],
+                            "ingredients": ingredients_unit, # A dictionary
+                            "allergens": request.form.getlist('allergens'),
+                            "instructions": instructions,
+                            "last_modified": datetime.utcnow()
+                        }})
 
-    return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
+            return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
+        else:
+            flash("You are not the author of that recipe, hence you are not allowed to edit.", category='error')
+            return redirect('/')
+    else:
+        flash("Invalid recipe id", category='error')
+        return redirect('/')
 
 @app.route('/delete_recipe/<recipe_id>')
 def delete_recipe(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    if 'username' in session and session['username'] == recipe['author']:
-        mongo.db.recipes.delete_one({"_id": ObjectId(recipe_id)})
-        return redirect(url_for('user_page', user_name=recipe['author']))
-
-    return "You are not authorised to delete this recipe."
+    if recipe:
+        if 'username' in session and session['username'] == recipe['author']:
+            mongo.db.recipes.delete_one({"_id": ObjectId(recipe_id)})
+            return redirect(url_for('user_page', user_name=recipe['author']))
+        else:
+            flash("You are not the author of that recipe, hence you are not allowed to delete.", category='error')
+            return redirect('/')
+    else:
+        flash("Invalid recipe id", category='error')
+        return redirect('/')
 
 @app.route('/upvote/<recipe_id>', methods=['GET', 'POST'])
 def upvote(recipe_id):
     recipe = mongo.db.recipes.find_one({"_id": ObjectId(recipe_id)})
-    try:
-        if 'username' in session and session['username'] not in recipe['upvote']:
-            recipe['upvote'].append(session['username'])
-        elif 'username' in session and session['username'] in recipe['upvote']:
-            recipe['upvote'].remove(session['username'])
+    if recipe:
+        if 'username' in session: # In order to use upvote, one need to login.
+            if session['username'] not in recipe['upvote']:
+                recipe['upvote'].append(session['username'])
+            elif session['username'] in recipe['upvote']:
+                recipe['upvote'].remove(session['username'])
 
-        mongo.db.recipes.update_one({"_id": ObjectId(recipe_id)},
-                { '$set': {
-                    "upvote": recipe['upvote'],
-                    "upvote_count": len(recipe['upvote'])
-                }})
+            mongo.db.recipes.update_one({"_id": ObjectId(recipe_id)},
+                    { '$set': {
+                        "upvote": recipe['upvote'],
+                        "upvote_count": len(recipe['upvote'])
+                    }})
 
-        return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
-    except:
+            return redirect(url_for('view_recipe', recipe_id=recipe['_id']))
+        else:
+            return redirect('/login')
+    else:
+        flash("Invalid recipe id", category='error')
         return redirect('/')
 
 @app.route('/user/<user_name>')
 def user_page(user_name):
-    if 'username' in session:
+    user = mongo.db.users.find_one({'username': user_name})
+    if user and 'username' in session and user_name == session['username']:
         pointer = mongo.db.recipes.find({"author": user_name })
         recipes = [p for p in pointer]
         return render_template('user_page.html', recipes=recipes)
-
-    return redirect('/')
+    elif user == None:
+        flash("No such user", category='error')
+        return redirect('/')
+    elif 'username' not in session:
+        return redirect(url_for('login'))
+    elif user_name != session['username']:
+        return redirect(url_for('user_page', user_name=session['username']))
+    else: # pragma: no cover
+        flash("An error has occured, please try again.", category='error')
+        return redirect('/')
 
 @app.route('/new_arrivals')
 def new_arrivals():
